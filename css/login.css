@@ -1,0 +1,33 @@
+/* Tela de login / cadastro */
+.auth-overlay{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
+  background:linear-gradient(160deg,#f2ebdc 0%,#e7dcc3 100%)}
+.auth-overlay[hidden]{display:none}
+.auth-card{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:28px 24px;box-shadow:0 12px 40px rgba(0,0,0,.15)}
+.auth-marca{text-align:center;margin-bottom:8px}
+.auth-marca img{border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.auth-titulo{font-size:1.5rem;text-align:center;margin:8px 0 4px;font-family:var(--font-display,inherit)}
+.auth-sub{text-align:center;color:#6b6b6b;font-size:.92rem;margin-bottom:18px}
+.auth-campo{margin-bottom:14px}
+.auth-campo[hidden],.auth-link[hidden],.auth-rodape[hidden],.auth-msg[hidden]{display:none}
+.auth-campo label{display:block;font-size:.85rem;font-weight:600;margin-bottom:4px;color:#333}
+.auth-senha-wrap{position:relative}
+.auth-senha-wrap .form-control{padding-right:44px}
+.auth-ver{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:none;padding:8px 10px;color:#666}
+.auth-link{display:block;text-align:right;font-size:.85rem;margin:-4px 0 12px}
+.auth-msg{font-size:.88rem;padding:8px 10px;border-radius:8px;margin-bottom:12px}
+.auth-msg.erro{background:#fde8e8;color:#9b1c1c}
+.auth-msg.ok{background:#e3f6ea;color:#14663a}
+.auth-rodape{text-align:center;font-size:.9rem;margin:16px 0 0}
+body.auth-aberta{overflow:hidden}
+body.auth-aberta > *:not(#auth-overlay):not(script){visibility:hidden}
+body.auth-aberta #auth-overlay{visibility:visible}
+
+/* Perfil em Configurações */
+.perfil-topo{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.perfil-previa{width:72px;height:72px;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.perfil-emojis{display:flex;flex-wrap:wrap;gap:6px}
+.perfil-emoji{width:44px;height:44px;font-size:1.4rem;border:2px solid transparent;border-radius:10px;background:rgba(127,127,127,.12)}
+.perfil-emoji.ativo{border-color:var(--bs-primary,#6366f1)}
+.perfil-cores{display:flex;gap:6px;flex-wrap:wrap}
+.perfil-cor{width:32px;height:32px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.perfil-cor.ativo{border-color:#fff;box-shadow:0 0 0 2px #333}

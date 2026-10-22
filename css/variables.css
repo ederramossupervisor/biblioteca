@@ -1,0 +1,208 @@
+/* -------------------------------------------
+   Variáveis CSS – Temas Claro e Escuro
+   Paleta "biblioteca": musgo + papel, herdada do
+   gradiente da splash screen (#5C6B5A / #8B7D6B),
+   em vez do roxo-índigo genérico de dashboard.
+------------------------------------------- */
+:root {
+  /* Cores principais */
+  --primary: #5C6B5A;          /* musgo — da própria splash screen */
+  --primary-hover: #46543F;
+  --primary-light: #E7EBE3;
+  --secondary: #8B7D6B;        /* taupe — segunda cor da splash */
+  --accent: #8B4A3D;           /* vinho/tijolo — usado com moderação (sequência, destaques) */
+
+  /* Tema claro — tons de papel, não de tela fria */
+  --bg-primary: #ffffff;
+  --bg-secondary: #F6F3EC;
+  --bg-card: #FFFEFB;
+  --text-primary: #2B2721;
+  --text-secondary: #746B5E;
+  --border-color: #E3DDD0;
+  --shadow: 0 1px 3px rgba(43,39,33,0.07), 0 1px 2px rgba(43,39,33,0.05);
+  --shadow-md: 0 4px 6px rgba(43,39,33,0.06), 0 2px 4px rgba(43,39,33,0.05);
+  --shadow-lg: 0 10px 25px rgba(43,39,33,0.09), 0 4px 6px rgba(43,39,33,0.05);
+  --navbar-bg: #FFFEFB;
+  --sidebar-bg: #FFFEFB;
+  --card-hover-shadow: 0 12px 28px rgba(92,107,90,0.16), 0 4px 8px rgba(43,39,33,0.06);
+
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Lora', Georgia, serif; /* usada com moderação, só em títulos */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode {
+  --bg-primary: #1B1914;
+  --bg-secondary: #201E18;
+  --bg-card: #26241D;
+  --text-primary: #EDE7DA;
+  --text-secondary: #A79C89;
+  --border-color: #3A362C;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+  --navbar-bg: #201E18;
+  --sidebar-bg: #201E18;
+  --primary: #8FA089;
+  --primary-hover: #A6B79F;
+  --primary-light: #2E3329;
+  --card-hover-shadow: 0 12px 28px rgba(143,160,137,0.22);
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+}
+/* ========== MELHORIAS VISUAIS – Calixteca ========== */
+
+/* Cards mais elegantes */
+.card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(43,39,33,0.06) !important;
+  transition: box-shadow 0.3s ease, transform 0.2s ease !important;
+}
+.card:hover {
+  box-shadow: 0 8px 20px rgba(43,39,33,0.09) !important;
+  transform: translateY(-1px);
+}
+
+/* Tipografia refinada — serifada só em títulos, com moderação */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.2px;
+  font-weight: 600;
+}
+
+/* Barra inferior com efeito de vidro (mobile), nos tons de papel */
+.bottom-nav {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255,254,251,0.82) !important;
+  border-top: 1px solid rgba(43,39,33,0.06);
+}
+
+/* Modo escuro – vidro na barra inferior */
+body.dark-mode .bottom-nav {
+  background-color: rgba(27, 25, 20, 0.85) !important;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Capa do livro com sombra e borda */
+#livro-atual-capa img {
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+#livro-atual-capa img:hover {
+  transform: scale(1.03);
+}
+
+/* Animação de pulsar para conquistas (usada via JS, mas podemos preparar a classe) */
+.conquista-card.conquistada .conquista-badge {
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Background sutil no modo claro */
+body.light-mode {
+  background: linear-gradient(135deg, #F6F3EC 0%, #ECE6D8 100%);
+}
+
+/* Ajuste de espaçamento nos títulos das páginas */
+.page h1 {
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: var(--primary);
+}
+
+/* Suavizar transições de página */
+.page.active {
+  animation: fadeSlideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* CSS do ripple */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: ripple-anim 0.6s ease-out;
+}
+@keyframes ripple-anim {
+  to { transform: scale(4); opacity: 0; }
+}
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0,0,0,0.3) !important;
+}
+.nav-tabs {
+  border-bottom: 2px solid var(--border-color);
+}
+.nav-tabs .nav-link {
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  position: relative;
+}
+.nav-tabs .nav-link.active {
+  color: var(--primary);
+  background: transparent;
+}
+.nav-tabs .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.nav-tabs .nav-link.active::after {
+  transform: scaleX(1);
+}
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+.empty-state i {
+  font-size: 3rem;
+  opacity: 0.3;
+  margin-bottom: 1rem;
+}
+.heatmap-cell {
+  border-radius: 3px;
+  transition: transform 0.15s;
+}
+.heatmap-cell:hover {
+  transform: scale(1.4);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.page {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.page.active {
+  display: block;
+  opacity: 1;
+}

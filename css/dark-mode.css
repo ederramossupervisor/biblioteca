@@ -1,0 +1,190 @@
+/* =============================================
+   MODO ESCURO – Calixteca
+   ============================================= */
+
+/* Fundo do body (substitui qualquer gradiente claro) */
+body.dark-mode {
+  background: var(--bg-primary) !important;
+}
+
+/* Cartões com transição suave */
+body.dark-mode .card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+/* Inputs e selects */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+  border-color: var(--primary);
+}
+
+/* Modal */
+body.dark-mode .modal-content {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+body.dark-mode .modal-header {
+  border-bottom-color: var(--border-color);
+}
+body.dark-mode .modal-footer {
+  border-top-color: var(--border-color);
+}
+
+/* Tabelas dentro do modal */
+body.dark-mode #modal-conteudo table tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+body.dark-mode #modal-conteudo table td,
+body.dark-mode #modal-conteudo table th {
+  color: var(--text-primary);
+}
+
+/* Barras de progresso */
+body.dark-mode .progress {
+  background-color: var(--bg-secondary);
+}
+
+/* Abas (nav-tabs) */
+body.dark-mode .nav-tabs {
+  border-bottom-color: var(--border-color);
+}
+body.dark-mode .nav-tabs .nav-link {
+  color: var(--text-secondary);
+}
+body.dark-mode .nav-tabs .nav-link.active {
+  color: var(--primary);
+  background-color: transparent;
+}
+body.dark-mode .nav-tabs .nav-link:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+/* List group (insights, top autores, etc.) */
+body.dark-mode .list-group-item {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Offcanvas (menu mobile) */
+body.dark-mode .offcanvas {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Barra inferior (vidro escuro) */
+body.dark-mode .bottom-nav {
+  background-color: rgba(11, 17, 32, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Capa do livro no dashboard */
+body.dark-mode #livro-atual-capa img {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* Conquistas – badge bloqueada */
+body.dark-mode .conquista-card .badge.bg-light {
+  background-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+/* Heatmap (opcional, as cores já são geradas dinamicamente) */
+
+/* Melhora a visibilidade dos títulos de seção */
+body.dark-mode .card-header {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-bottom-color: var(--border-color);
+}
+
+/* Ajuste para textos secundários em lugares específicos */
+body.dark-mode .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Garante que os ícones de estado vazio fiquem visíveis */
+body.dark-mode .empty-state i {
+  opacity: 0.5;
+}
+/* ========== FORÇA HERANÇA DE COR NO MODO ESCURO ========== */
+body.dark-mode,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode li,
+body.dark-mode label,
+body.dark-mode small,
+body.dark-mode th,
+body.dark-mode td,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--text-primary);
+}
+
+/* Mantém os textos secundários com a cor correta */
+body.dark-mode .text-muted,
+body.dark-mode small.text-muted,
+body.dark-mode .text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+/* Badges */
+body.dark-mode .badge.bg-light {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+}
+body.dark-mode .badge.bg-primary {
+  background-color: var(--primary) !important;
+  color: #fff !important;
+}
+body.dark-mode .badge.bg-secondary {
+  background-color: var(--secondary) !important;
+  color: #fff !important;
+}
+
+/* Tabelas (em qualquer lugar, não só no modal) */
+body.dark-mode table,
+body.dark-mode table td,
+body.dark-mode table th {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+body.dark-mode table thead th {
+  background-color: var(--bg-secondary);
+}
+
+/* Input placeholders */
+body.dark-mode ::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.7;
+}
+
+/* Dropdowns e selects */
+body.dark-mode select option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* Pré-visualização de relatório e blocos de código */
+body.dark-mode pre,
+body.dark-mode #relatorio-conteudo {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Links dentro de conteúdo */
+body.dark-mode a:not(.btn):not(.nav-link) {
+  color: var(--primary);
+}

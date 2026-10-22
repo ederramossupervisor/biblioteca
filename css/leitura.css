@@ -1,0 +1,62 @@
+/* Registro de leitura */
+#tempo-calculado, #paginas-calculadas {
+  background: var(--bg-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+}
+#livro-info {
+  background: var(--bg-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius);
+}
+/* Animação pulsante para o cronômetro ativo */
+#cronometro-display.pulsando {
+  animation: crono-pulse 1.5s ease-in-out infinite;
+}
+@keyframes crono-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Grupos de botões com ícone (Humor, Clima) — substituem os <select> antigos */
+.grupo-icones-opcoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.btn-icone-opcao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid var(--border-color, #dee2e6);
+  background: transparent;
+  color: var(--text-secondary, #555);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.72rem;
+  min-width: 68px;
+  transition: var(--transition, 0.15s ease);
+}
+.btn-icone-opcao i {
+  font-size: 1.1rem;
+}
+.btn-icone-opcao.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* Botão discreto "usar tempo médio" (abaixo de Hora início/fim) */
+.btn-media-tempo {
+  font-size: 0.75rem;
+  padding: 0;
+  color: var(--text-secondary, #6c757d);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.btn-media-tempo:hover, .btn-media-tempo:focus {
+  color: var(--primary);
+  text-decoration: underline;
+  opacity: 1;
+}

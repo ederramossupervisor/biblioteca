@@ -1,0 +1,47 @@
+/* Botão flutuante (FAB) de adicionar livro — discreto, mas de fácil acesso */
+.fab-adicionar-livro {
+  display: none; /* só aparece na página Biblioteca (controlado via JS) */
+  position: fixed;
+  right: 1.25rem;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: var(--shadow-md);
+  opacity: 0.82;
+  transform: scale(1);
+  transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition), background-color var(--transition);
+  z-index: 40;
+  cursor: pointer;
+}
+.fab-adicionar-livro:hover,
+.fab-adicionar-livro:focus-visible {
+  opacity: 1;
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.06);
+  outline: none;
+}
+.fab-adicionar-livro:active {
+  transform: scale(0.96);
+}
+.fab-adicionar-livro.visivel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* No mobile, a barra inferior fica fixa: sobe o botão pra não sobrepor */
+@media (max-width: 767.98px) {
+  .fab-adicionar-livro {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    width: 44px;
+    height: 44px;
+    right: 1rem;
+    font-size: 1rem;
+  }
+}

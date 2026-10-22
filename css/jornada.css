@@ -1,0 +1,169 @@
+/* Jornada de leitura — timeline vertical (geral e por livro) */
+
+.jornada-timeline {
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.jornada-evento {
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+  padding-bottom: 1.35rem;
+}
+.jornada-evento:last-child {
+  padding-bottom: 0;
+}
+
+.jornada-data-col {
+  flex: 0 0 52px;
+  text-align: right;
+  padding-top: 0.15rem;
+  line-height: 1.05;
+}
+.jornada-dia {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.jornada-mes {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.jornada-marcador-col {
+  flex: 0 0 28px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.jornada-marcador-col::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  bottom: -1.35rem;
+  left: 50%;
+  width: 2px;
+  background: var(--border-color);
+  transform: translateX(-50%);
+}
+.jornada-evento:last-child .jornada-marcador-col::before {
+  display: none;
+}
+
+.jornada-ponto {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.7rem;
+  z-index: 1;
+  box-shadow: 0 0 0 3px var(--bg-card);
+}
+/* Reaproveita as cores já usadas no feed de Atividades do Dashboard
+   (css/dashboard.css) para manter a mesma identidade visual por tipo. */
+.jornada-ponto.timeline-marcador-livro { background: #8B7D6B; }
+.jornada-ponto.timeline-marcador-livro-comecou { background: #5C6B5A; }
+.jornada-ponto.timeline-marcador-livro-finalizado { background: #7A8B5E; }
+.jornada-ponto.timeline-marcador-livro-abandonado { background: #8B4A3D; }
+.jornada-ponto.timeline-marcador-anotacao { background: var(--text-secondary); }
+.jornada-ponto.timeline-marcador-conquista { background: var(--accent); }
+.jornada-ponto.timeline-marcador-sessao-leitura { background: #4A6B7C; }
+
+.jornada-conteudo {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+.jornada-conteudo.jornada-clicavel {
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.jornada-conteudo.jornada-clicavel:hover {
+  border-color: var(--primary);
+}
+.jornada-conteudo.jornada-clicavel:active {
+  transform: scale(0.99);
+}
+
+.jornada-tipo-evento {
+  font-weight: 700;
+  font-size: 0.92rem;
+  margin-bottom: 0.1rem;
+}
+.jornada-detalhe {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+.jornada-livro-relacionado {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+.jornada-hora {
+  font-size: 0.7rem;
+  margin-top: 0.15rem;
+}
+
+.jornada-vazio, .jornada-fim {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 1.25rem 0;
+}
+
+/* Filtros da Jornada geral */
+.jornada-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.jornada-filtros .form-select {
+  width: auto;
+}
+#jornada-periodo-personalizado {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#jornada-grafico-mensal-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 500px) {
+  .jornada-data-col {
+    flex-basis: 42px;
+  }
+  .jornada-dia {
+    font-size: 0.92rem;
+  }
+  .jornada-conteudo {
+    padding: 0.45rem 0.6rem;
+  }
+  .jornada-tipo-evento {
+    font-size: 0.86rem;
+  }
+  .jornada-detalhe {
+    font-size: 0.8rem;
+  }
+}

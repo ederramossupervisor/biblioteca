@@ -1,0 +1,194 @@
+/* ========== ANOTAÇÕES (POST-IT) ========== */
+
+/* Container da lista */
+#lista-anotacoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+/* Cada anotação como um post-it */
+.anotacao-card {
+  width: 220px;
+  min-height: 180px;
+  padding: 1.2rem 1rem 1rem 1rem;
+  background: #fef9c3;         /* amarelo padrão */
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
+  border-radius: 2px 20px 2px 20px;
+  position: relative;
+  font-family: 'Segoe UI', 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #333;
+  transition: transform 0.2s, box-shadow 0.2s;
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Puxadinho (fita adesiva) no topo */
+.anotacao-card::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 16px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  z-index: 1;
+}
+
+/* Cores alternadas automaticamente */
+.anotacao-card:nth-child(4n+1) { background: #fef9c3; }   /* amarelo */
+.anotacao-card:nth-child(4n+2) { background: #fcd5ce; }   /* rosa claro */
+.anotacao-card:nth-child(4n+3) { background: #ccdbfd; }   /* azul claro */
+.anotacao-card:nth-child(4n+4) { background: #d8f3dc; }   /* verde claro */
+
+/* Rotações alternadas para dar um ar “solto” */
+.anotacao-card:nth-child(odd)  { transform: rotate(-1.5deg); }
+.anotacao-card:nth-child(even) { transform: rotate(1.5deg); }
+
+/* Ajuste de hover para manter a rotação suave */
+.anotacao-card:nth-child(odd):hover  { transform: rotate(-1deg) scale(1.02); }
+.anotacao-card:nth-child(even):hover { transform: rotate(1deg) scale(1.02); }
+
+/* Badge de categoria */
+.anotacao-card .badge {
+  font-size: 0.7rem;
+  background: rgba(0,0,0,0.15);
+  color: #333;
+}
+
+/* Texto menor dentro do post-it */
+.anotacao-card p, .anotacao-card blockquote {
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.anotacao-card blockquote {
+  border-left: 3px solid rgba(0,0,0,0.2);
+  padding-left: 0.6rem;
+  font-style: italic;
+}
+
+/* Cabeçalho do post-it (badge + data) */
+.anotacao-card .cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Data no cabeçalho */
+.anotacao-card .data {
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+/* Título e autor (sem truncamento) */
+.anotacao-card .titulo-livro {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* Botão de compartilhar citação */
+.anotacao-card .compartilhar-anotacao {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.anotacao-card .compartilhar-anotacao:hover {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* ========== CITAÇÕES E MODAL (mantido) ========== */
+.citacao-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.citacao-card blockquote {
+  font-style: italic;
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+}
+
+/* Cartão de citação no modal de compartilhamento */
+#cartao-citacao {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  min-height: 250px;
+  position: relative;
+  transition: width 0.3s, height 0.3s;
+}
+
+#img-fundo-capa {
+  object-fit: cover;
+}
+
+/* Formatos */
+.format-feed {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1 / 1;
+}
+
+.format-stories {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 9 / 16;
+}
+
+@media (max-width: 575px) {
+  #cartao-citacao {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
+  #cartao-citacao {
+    max-height: 55vh;
+  }
+}
+
+/* ========== BARRA DE PESQUISA ========== */
+#page-anotacoes .search-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+#anotacoes-search {
+  border-radius: 0.5rem;
+}
+
+/* Em telas pequenas, cartões ocupam a largura total */
+@media (max-width: 500px) {
+  .anotacao-card {
+    width: 100%;
+  }
+}
+
+/* Destaque temporário ao chegar vindo da Jornada de leitura */
+.anotacao-destacada {
+  animation: anotacao-pulso 2.5s ease;
+}
+@keyframes anotacao-pulso {
+  0%, 100% { box-shadow: none; }
+  15%, 60% { box-shadow: 0 0 0 3px var(--primary); }
+}
+

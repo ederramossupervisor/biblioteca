@@ -1,0 +1,137 @@
+/* Estatísticas */
+
+/* ===== INSIGHTS (gerais e avançados) ===== */
+#insights-list li {
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+#insights-avancados-list li {
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+/* ===== GRÁFICOS ===== */
+.card canvas {
+  max-height: 300px !important;
+  width: 100% !important;
+}
+
+/* Gráficos de velocidade (Insights Avançados) – 2 por linha */
+#grafico-velocidade-genero,
+#grafico-velocidade-periodo,
+#grafico-velocidade-humor,
+#grafico-velocidade-duracao {
+  width: 100% !important;
+  height: 150px !important;
+  max-height: 150px;
+}
+
+/* ===== CALENDÁRIO ===== */
+.calendario-dia {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+.calendario-dia:hover {
+  background-color: var(--primary-light);
+}
+
+.row-cols-7 > * {
+  flex: 0 0 auto;
+  width: calc(100% / 7);
+}
+
+.calendario-dia {
+  aspect-ratio: auto;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  padding: 4px 2px;
+  transition: background-color 0.2s;
+  overflow: hidden;
+}
+
+.calendario-dia.com-leitura {
+  background-color: var(--primary-light);
+}
+
+.calendario-dia img {
+  width: 100%;
+  max-height: 55px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.calendario-dia i {
+  font-size: 1.2rem;
+  margin-top: 4px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== LOCAIS DE LEITURA (Mapa) ===== */
+.local-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1rem;
+  height: 100%;
+}
+.local-card i {
+  color: var(--primary);
+}
+
+.icone-capa-marcador {
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.avatar-marcador-local div {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: var(--font-family);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.leaflet-popup-content i {
+  color: var(--primary);
+  width: 1.1em;
+  text-align: center;
+}
+
+/* ===== TABELAS DOS INSIGHTS AVANÇADOS ===== */
+#tabela-clima thead,
+#tabela-nota-humor thead,
+#tabela-local-velocidade thead,
+#tabela-abandono-genero thead,
+#tabela-nota-genero thead,
+#tabela-dias-genero thead,
+#tabela-densidade-anotacoes thead {
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-card);
+  z-index: 1;
+}

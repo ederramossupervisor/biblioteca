@@ -1,0 +1,288 @@
+/* ========== LEITOR DE EBOOK ========== */
+
+#page-leitor.active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;   /* fallback */
+  height: 100dvh;  /* viewport dinâmica no mobile — sobrescreve se suportado */
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-body);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 768px) {
+  #page-leitor.active {
+    left: 250px;
+  }
+}
+
+.leitor-topbar, .leitor-bottombar {
+  flex-shrink: 0;
+}
+
+#leitor-container {
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+#leitor-container:not(.modo-paginado) {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#leitor-container.modo-paginado {
+  overflow: hidden !important;
+}
+
+#leitor-container.modo-paginado iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#leitor-container.tema-claro { background: #ffffff; color: #1e293b; }
+#leitor-container.tema-sepia { background: #f5e6d3; color: #3e2723; }
+#leitor-container.tema-escuro { background: #1e293b; color: #e2e8f0; }
+
+.leitor-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.leitor-topbar {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.25rem;
+}
+.leitor-topbar .btn {
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .leitor-topbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    overflow-x: visible;
+    row-gap: 0.4rem;
+  }
+  .leitor-topbar > div {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .leitor-topbar .btn {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.8rem;
+  }
+  #leitor-titulo-livro {
+    max-width: 100% !important;
+    text-align: center;
+  }
+}
+
+#offcanvasIndice {
+  width: min(85vw, 320px);
+}
+#lista-indice li {
+  padding: 0.6rem 0.25rem;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  line-height: 1.4;
+}
+
+#modal-config-leitor {
+  z-index: 1055;
+}
+
+/* Zonas de clique para virar página no modo paginado */
+.zona-clique {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  z-index: 5;
+  cursor: pointer;
+  touch-action: manipulation; /* evita delay/ambiguidade de toque no mobile */
+  /* deixe visível durante o teste, depois apague esta linha: */
+  /* background: rgba(255,0,0,0.1); */
+}
+
+.zona-esquerda {
+  left: 0;
+}
+
+.zona-direita {
+  right: 0;
+}
+
+/* Só ativa as zonas no modo paginado — no modo rolagem, não faz sentido */
+#leitor-container:not(.modo-paginado) .zona-clique {
+  display: none;
+}
+
+/* ========== MODO TELA CHEIA / IMERSIVO ========== */
+/* Quando ativo, a barra superior e a inferior saem do fluxo do layout
+   (o container de leitura ocupa 100% do espaço) e passam a flutuar por
+   cima do conteúdo apenas quando reveladas por um toque no centro. */
+#page-leitor.leitor-imersivo .leitor-topbar,
+#page-leitor.leitor-imersivo .leitor-bottombar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+}
+
+#page-leitor.leitor-imersivo .leitor-topbar {
+  top: 0;
+  transform: translateY(-100%);
+}
+
+#page-leitor.leitor-imersivo .leitor-bottombar {
+  bottom: 0;
+  transform: translateY(100%);
+}
+
+#page-leitor.leitor-imersivo.leitor-mostrar-barras .leitor-topbar,
+#page-leitor.leitor-imersivo.leitor-mostrar-barras .leitor-bottombar {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Zona central de toque: revela as barras no modo imersivo */
+#zona-clique-centro {
+  touch-action: manipulation;
+}
+
+/* ==========================================================
+
+/* Popup que aparece ao selecionar texto no EPUB (Grifar / Citar) */
+.popup-selecao-leitor {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 400;
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-card, #fff);
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+.popup-selecao-leitor.d-none {
+  display: none;
+}
+
+/* Marca visual do texto grifado dentro do EPUB (aplicada via
+   rendition.annotations, mas garantimos um estilo de fallback) */
+.hl-calixteca {
+  mix-blend-mode: multiply;
+}
+
+/* Camada de texto do PDF — precisa ficar exatamente sobre o canvas,
+   com o texto transparente (só a caixa de seleção fica visível) */
+.textLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  opacity: 1;
+  line-height: 1;
+}
+.textLayer span,
+.textLayer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+.textLayer ::selection {
+  background: rgba(92, 107, 90, 0.35); /* cor --primary do app, com transparência */
+}
+
+/* Grifos feitos no PDF: como não existe CFI, o grifo é desenhado como um
+   retângulo posicionado por cima do texto (calculado a partir da seleção),
+   dentro de uma camada própria que acompanha o zoom da página. */
+.grifos-overlay-pdf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+.hl-calixteca-pdf {
+  position: absolute;
+  mix-blend-mode: multiply;
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 2px;
+}
+
+/* Modo de rolagem contínua do EPUB: o container deixa de ser
+   "overflow: hidden" (que só faz sentido no modo paginado) */
+#leitor-container:not(.modo-paginado) #leitor-conteudo {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+/* Barra de busca dentro do documento (PDF) */
+.leitor-busca-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-card, #fff);
+  padding: 0.35rem 0.5rem;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  max-width: min(92vw, 420px);
+}
+.leitor-busca-bar.d-none {
+  display: none;
+}
+.leitor-busca-bar input {
+  min-width: 0;
+  flex: 1;
+}
+.busca-contador {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #746B5E);
+  white-space: nowrap;
+  padding: 0 0.2rem;
+}
+
+/* Destaque das ocorrências encontradas na página de PDF atual */
+.textLayer .busca-destaque {
+  background: rgba(255, 213, 79, 0.55);
+  border-radius: 2px;
+}
+.textLayer .busca-destaque-atual {
+  background: rgba(255, 152, 0, 0.75);
+}

@@ -1,0 +1,59 @@
+/* Cartão da Retrospectiva do Ano — pensado para ficar bonito tanto na tela
+   quanto na imagem baixada via html2canvas (por isso cores fixas, não
+   variáveis de tema: a imagem precisa ficar igual em qualquer modo). */
+.retrospectiva-cartao {
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius, 10px);
+  background: linear-gradient(135deg, #5C6B5A 0%, #2B2721 100%);
+  color: #FFFEFB;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.retrospectiva-ano {
+  font-family: var(--font-display), serif;
+  font-size: 3rem;
+  font-weight: 700;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+.retrospectiva-titulo {
+  font-family: var(--font-display), serif;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.retrospectiva-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.retrospectiva-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.9rem 0.5rem;
+}
+
+.retrospectiva-numero {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.retrospectiva-label {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.retrospectiva-destaque {
+  margin: 0.35rem 0;
+  font-size: 0.95rem;
+}
+
+.retrospectiva-marca {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}

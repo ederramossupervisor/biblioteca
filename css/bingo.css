@@ -1,0 +1,38 @@
+/* Bingo Literário */
+.bingo-card-tema {
+  border-left: 4px solid var(--bingo-cor, var(--primary));
+  transition: opacity 0.2s ease;
+}
+.bingo-card-tema.bingo-bloqueado {
+  opacity: 0.72;
+}
+.bingo-icone-tema {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bingo-cor, var(--primary)) 16%, transparent);
+  color: var(--bingo-cor, var(--primary));
+  font-size: 1.1rem;
+}
+.bingo-historico-tema {
+  border-top: 1px solid var(--border-color);
+}
+.bingo-item-clicavel {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+.bingo-item-clicavel:hover {
+  background: color-mix(in srgb, var(--bingo-cor, var(--primary)) 10%, transparent);
+}
+#bingo-resumo-geral {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.25rem;
+}

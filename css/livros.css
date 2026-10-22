@@ -1,0 +1,38 @@
+/* Página de cadastro de livros */
+#cover-preview img {
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+#search-results .list-group-item {
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+#search-results .list-group-item:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Skeleton placeholder (para buscas) */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+#scan-isbn-btn {
+  border-left: none;
+}
+#scanner-container {
+  width: 100%;
+  max-width: 500px;
+}
+#scanner-container video,
+#scanner-container canvas {
+  width: 100%;
+  border-radius: 12px;
+}
