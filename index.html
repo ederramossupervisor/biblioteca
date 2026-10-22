@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a73e8">
+  <meta name="description" content="Seu diário de leitura inteligente">
+  <meta name="apple-mobile-web-app-title" content="Leitura">
+  <!-- manifest, ícone e título são gerados por js/perfil.js conforme o perfil de cada pessoa -->
+  <link rel="manifest" id="app-manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="img/icons/icon-192x192.png">
+
+  <title>Leitura</title>
+  <link rel="icon" type="image/png" href="img/icons/favicon-32x32.png">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome (Para os ícones do sistema) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts (13 fontes do leitor) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&family=Lato:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Montserrat:wght@400;500;600&family=Nunito:wght@400;600&family=Open+Sans:ital,wght@0,400;0,600;1,400&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&family=Vollkorn:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Fonte para Dislexia -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Estilos modulares -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/livros.css">
+  <link rel="stylesheet" href="css/leitura.css">
+  <link rel="stylesheet" href="css/leitor.css"> 
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/biblioteca.css">
+  <link rel="stylesheet" href="css/estatisticas.css">
+  <link rel="stylesheet" href="css/metas.css">
+  <link rel="stylesheet" href="css/anotacoes.css">
+  <link rel="stylesheet" href="css/desejos.css">
+  <link rel="stylesheet" href="css/exportar.css">
+  <link rel="stylesheet" href="css/configuracoes.css">
+  <link rel="stylesheet" href="css/retrospectiva.css">
+  <link rel="stylesheet" href="css/bingo.css">
+  <link rel="stylesheet" href="css/jornada.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/dark-mode.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="preload" as="image" href="img/fundo-splash.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="light-mode">
+  <!-- Tela de login / cadastro -->
+  <div id="auth-overlay" class="auth-overlay" hidden>
+    <div class="auth-card">
+      <div class="auth-marca"><img data-app-logo src="img/icons/logo.png" alt="" width="64" height="64"></div>
+      <h1 id="auth-titulo" class="auth-titulo">Entrar</h1>
+      <p id="auth-sub" class="auth-sub"></p>
+      <form id="auth-form">
+        <div id="auth-campo-email" class="auth-campo">
+          <label for="auth-email">E-mail</label>
+          <input id="auth-email" type="email" autocomplete="email" inputmode="email" class="form-control" required>
+        </div>
+        <div id="auth-campo-senha" class="auth-campo">
+          <label for="auth-senha">Senha</label>
+          <div class="auth-senha-wrap">
+            <input id="auth-senha" type="password" autocomplete="current-password" class="form-control" minlength="6" required>
+            <button type="button" id="auth-ver-senha" class="auth-ver" aria-label="Mostrar senha" aria-pressed="false"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div id="auth-campo-senha2" class="auth-campo" hidden>
+          <label for="auth-senha2">Repita a senha</label>
+          <input id="auth-senha2" type="password" autocomplete="new-password" class="form-control" minlength="6">
+        </div>
+        <a href="#" id="auth-link-esqueci" class="auth-link">Esqueci minha senha</a>
+        <div id="auth-msg" class="auth-msg erro" role="alert" hidden></div>
+        <button id="auth-enviar" type="submit" class="btn btn-primary w-100">Entrar</button>
+      </form>
+      <p id="auth-rodape-entrar" class="auth-rodape">Ainda não tem conta? <a href="#" id="auth-ir-cadastrar">Criar conta</a></p>
+      <p id="auth-rodape-cadastrar" class="auth-rodape" hidden>Já tem conta? <a href="#" id="auth-ir-entrar">Entrar</a></p>
+    </div>
+  </div>
+ <!-- Splash screen (aparece enquanto carrega) -->
+<div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('img/fundo-splash.png'); background-size: cover; background-position: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;">
+  <!-- Conteúdo removido: apenas a imagem de fundo -->
+</div>
+  <!-- Barra de navegação inferior (mobile-first) -->
+  <nav class="bottom-nav d-md-none fixed-bottom bg-white shadow-lg">
+    <div class="container d-flex justify-content-around py-1">
+      <a href="#" class="nav-item text-center active px-1" data-page="dashboard">
+        <i class="fas fa-home fa-sm"></i>
+        <small class="d-block text-nowrap">Início</small>
+      </a>
+      <a href="#" class="nav-item text-center px-1" data-page="biblioteca">
+        <i class="fas fa-book fa-sm"></i>
+        <small class="d-block text-nowrap">Biblioteca</small>
+      </a>
+      <a href="#" class="nav-item text-center px-1" data-page="leitura">
+        <i class="fas fa-clock fa-sm"></i>
+        <small class="d-block text-nowrap">Registrar</small>
+      </a>
+      <a href="#" class="nav-item text-center px-1" data-page="estatisticas">
+        <i class="fas fa-chart-pie fa-sm"></i>
+        <small class="d-block text-nowrap">Estatísticas</small>
+      </a>
+      <a href="#" class="nav-item text-center px-1" data-page="leitor">
+        <i class="fas fa-book-open fa-sm"></i>
+        <small class="d-block text-nowrap">Leitor</small>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Offcanvas Menu Mobile -->
+  <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="mobileMenuLabel" style="font-family: var(--font-display);">
+        <img src="img/icons/logo.png" data-app-logo alt="" width="32" height="32" class="me-2 rounded"> <span data-app-nome>Leitura</span>
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <nav class="nav flex-column">
+        <a href="#" class="nav-link" data-page="desejos"><i class="fas fa-heart me-2"></i> Desejos</a>
+        <a href="#" class="nav-link" data-page="adicionar"><i class="fas fa-plus-circle me-2"></i> Adicionar</a>
+        <a href="#" class="nav-link" data-page="metas"><i class="fas fa-bullseye me-2"></i> Metas</a>
+        <a href="#" class="nav-link" data-page="bingo"><i class="fas fa-dice me-2"></i> Bingo Literário</a>
+        <a href="#" class="nav-link" data-page="jornada"><i class="fas fa-compass me-2"></i> Jornada de leitura</a>
+        <a href="#" class="nav-link" data-page="anotacoes"><i class="fas fa-sticky-note me-2"></i> Anotações</a>
+        <a href="#" class="nav-link" data-page="exportar"><i class="fas fa-download me-2"></i> Exportar</a>
+        <a href="#" class="nav-link" data-page="configuracoes"><i class="fas fa-cog me-2"></i> Configurações</a>
+      </nav>
+      <hr>
+      <button id="theme-toggle-mobile" class="btn btn-outline-secondary w-100">
+        <i class="fas fa-moon"></i> <span class="ms-1">Modo escuro</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra superior mobile -->
+  <nav class="mobile-navbar d-md-none bg-white shadow-sm px-3 py-2 d-flex justify-content-between align-items-center">
+    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+      <i class="fas fa-bars"></i>
+    </button>
+    <span class="fw-bold d-flex align-items-center gap-2" style="font-family: var(--font-display);">
+      <span data-app-nome>Leitura</span>
+      <span class="sync-status" data-sync-status="sincronizado" title="Sincronizado">
+        <i class="sync-status-icon fas fa-check-circle text-success"></i>
+        <span class="badge bg-warning text-dark rounded-pill d-none" data-fila-offline-contador title="Sessões aguardando sincronizar" style="font-size:0.6rem;"></span>
+      </span>
+    </span>
+    <div class="d-flex align-items-center gap-1">
+      <button class="btn btn-outline-secondary btn-sm btn-busca-global" title="Busca global">
+        <i class="fas fa-search"></i>
+      </button>
+      <button id="theme-toggle-mobile-top" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Sidebar (desktop) -->
+  <aside class="sidebar d-none d-md-flex flex-column bg-white shadow-sm">
+    <div class="sidebar-icon-grid px-2 mt-3 mb-3">
+      <a href="#" class="nav-link sidebar-icon active" data-page="dashboard" title="Início"><i class="fas fa-home"></i></a>
+      <a href="#" class="nav-link sidebar-icon btn-busca-global" title="Buscar"><i class="fas fa-search"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="biblioteca" title="Biblioteca"><i class="fa-solid fa-book"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="adicionar" title="Adicionar"><i class="fas fa-plus"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="leitura" title="Sessões"><i class="fas fa-clock"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="leitor" title="Leitor"><i class="fas fa-book-open"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="estatisticas" title="Estatísticas"><i class="fas fa-chart-pie"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="metas" title="Metas"><i class="fas fa-bullseye"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="bingo" title="Bingo Literário"><i class="fas fa-dice"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="jornada" title="Jornada de leitura"><i class="fas fa-compass"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="anotacoes" title="Anotações"><i class="fas fa-sticky-note"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="desejos" title="Desejos"><i class="fas fa-heart"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="exportar" title="Exportar"><i class="fas fa-download"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="configuracoes" title="Configurações"><i class="fas fa-cog"></i></a>
+    </div>
+  </aside>
+
+  <!-- Área de conteúdo principal -->
+  <main id="main-content" class="content-area">
+    <!-- ==================== PÁGINA: Dashboard ==================== -->
+    <div id="page-dashboard" class="page active">
+      <div class="container py-4">
+        <div class="text-center mb-3">
+          <h1 class="mb-0 dashboard-title">
+            <span data-app-nome>Leitura</span><span class="sync-status-desktop dashboard-sync-icon" data-sync-status="sincronizado" title="Sincronizado">
+              <i class="sync-status-icon fas fa-check-circle text-success"></i>
+              <span class="badge bg-warning text-dark rounded-pill sidebar-sync-badge d-none" data-fila-offline-contador title="Sessões aguardando sincronizar"></span>
+              <span class="sidebar-sync-toast" aria-live="polite"></span>
+            </span>
+          </h1>
+          <p class="text-secondary mb-0">Meu Diário de Leitura</p>
+        </div>
+        <div class="row g-3">
+          <!-- Card: Livro atual -->
+          <div class="col-12">
+            <div class="card shadow-sm">
+              <div class="card-body d-flex align-items-center" id="livro-atual-card">
+                <div class="me-3">
+                  <img src="img/icons/logo.png" data-app-logo alt="" width="48" height="48" class="rounded">
+                </div>
+                <div>
+                  <small class="text-muted">Leitura atual</small>
+                  <h5 class="mb-0" id="livro-atual-titulo">Nenhum livro em andamento</h5>
+                  <span id="livro-atual-progresso" class="small"></span>
+                  <br>
+                  <small id="livro-atual-previsao" class="text-success fw-bold d-none"></small>
+                  <br>
+                  <small id="livro-atual-tempo-restante" class="text-info fw-bold d-none"></small>
+                </div>
+                <div class="ms-auto" id="livro-atual-capa"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Cards de números -->
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-book fa-2x text-success mb-2"></i>
+                <h3 class="mb-0" id="card-livros-mes">0</h3>
+                <small>Livros este mês</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                <h3 class="mb-0" id="card-livros-ano">0</h3>
+                <small>Livros este ano</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-file-alt fa-2x text-warning mb-2"></i>
+                <h3 class="mb-0" id="card-paginas-hoje">0</h3>
+                <small>Páginas hoje</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-layer-group fa-2x text-info mb-2"></i>
+                <h3 class="mb-0" id="card-paginas-semana">0</h3>
+                <small>Páginas na semana</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-clock fa-2x text-danger mb-2"></i>
+                <h3 class="mb-0" id="card-horas">0</h3>
+                <small>Horas lidas (total)</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card text-center h-100 shadow-sm">
+              <div class="card-body">
+                <i class="fas fa-fire fa-2x text-orange mb-2"></i>
+                <h3 class="mb-0" id="card-sequencia">0</h3>
+                <small>Sequência atual (dias)</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimos livros lidos: 5 no mobile, 10 no desktop (js/dashboard.js) -->
+        <div class="card mt-3 shadow-sm" id="ultimos-lidos-card">
+          <div class="card-body">
+            <h5>Últimos livros lidos</h5>
+            <div id="ultimos-lidos-container">
+              <div class="text-muted small" id="ultimos-lidos-vazio">Nenhum livro finalizado ainda.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mapa de calor de leitura: mês por vez, com pílulas Jan-Dez como
+             seletor (movido de Estatísticas pra cá) -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-body">
+            <h5><i class="fas fa-fire me-2"></i>Mapa de calor de leitura</h5>
+            <div id="heatmap-container"></div>
+            <div class="d-flex justify-content-center mt-2">
+              <small class="me-2">Menos</small>
+              <div class="d-flex gap-1 align-items-center">
+                <span style="width:12px;height:12px;background:#EDEAE2;border-radius:2px;"></span>
+                <span style="width:12px;height:12px;background:#C9D2C4;border-radius:2px;"></span>
+                <span style="width:12px;height:12px;background:#9DAE96;border-radius:2px;"></span>
+                <span style="width:12px;height:12px;background:#6E8266;border-radius:2px;"></span>
+                <span style="width:12px;height:12px;background:#46543F;border-radius:2px;"></span>
+              </div>
+              <small class="ms-2">Mais</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-body">
+            <h5>Meta anual de livros</h5>
+            <div class="progress mb-2">
+              <div class="progress-bar" id="barra-meta" role="progressbar" style="width: 0%">0%</div>
+            </div>
+            <span id="meta-texto">0 de 0 livros (0%)</span>
+          </div>
+        </div>
+
+        <!-- Timeline de atividades: feed unificado (sessões, livros, anotações,
+             conquistas/metas batidas), mais recente no topo, com scroll infinito
+             buscando páginas antigas sob demanda no Apps Script (js/timeline.js) -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Atividades</h5>
+              <a href="#" class="small nav-link p-0" data-page="jornada"><i class="fas fa-compass me-1"></i>Ver jornada completa</a>
+            </div>
+            <div id="timeline-container" class="mt-2">
+              <div class="text-muted small" id="timeline-vazio">Nenhuma atividade registrada ainda.</div>
+            </div>
+            <div id="timeline-sentinela" class="text-center py-2 d-none">
+              <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+            </div>
+            <div id="timeline-fim" class="text-muted small text-center py-2 d-none">Fim do histórico.</div>
+          </div>
+        </div> <!-- fecha o último card (timeline) -->
+      </div> <!-- fecha container py-4 -->
+    </div> <!-- fecha page-dashboard -->
+
+    <!-- ==================== PÁGINA: Biblioteca ==================== -->
+    <div id="page-biblioteca" class="page">
+      <div class="container py-4">
+        <h1 class="mb-4">Minha Biblioteca</h1>
+
+        <!-- Barra de ferramentas simplificada -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-8 col-lg-6">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" id="biblioteca-search" class="form-control" placeholder="Pesquisar por título, autor ou tags...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtro rápido por status (fica fixo no topo ao rolar) -->
+        <div class="biblioteca-filtros-status mb-3" id="biblioteca-filtros-status">
+          <button type="button" class="chip-filtro active" data-status="">Todos</button>
+          <button type="button" class="chip-filtro" data-status="Lendo">Lendo</button>
+          <button type="button" class="chip-filtro" data-status="Quero ler">Quero ler</button>
+          <button type="button" class="chip-filtro" data-status="Finalizado">Finalizado</button>
+        </div>
+
+        <!-- Contador -->
+        <p class="text-muted mb-3" id="biblioteca-contador">Carregando...</p>
+
+        <!-- Grade de livros -->
+        <div id="biblioteca-grid" class="row g-3">
+          <!-- Preenchido dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PÁGINA: Adicionar Livro ==================== -->
+    <div id="page-adicionar" class="page">
+      <div class="container py-4">
+        <h1 class="mb-4">Adicionar Livro</h1>
+
+        <!-- Formulário manual (sem busca inteligente) -->
+        <form id="book-form" novalidate>
+          <div class="row g-3">
+            <!-- Coluna esquerda -->
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-header fw-bold">Informações básicas</div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="titulo" class="form-label">Título *</label>
+                    <input type="text" id="titulo" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="subtitulo" class="form-label">Subtítulo</label>
+                    <input type="text" id="subtitulo" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <label for="autor" class="form-label">Autor *</label>
+                    <input type="text" id="autor" class="form-control" required>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label for="editora" class="form-label">Editora</label>
+                      <input type="text" id="editora" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="ano" class="form-label">Ano</label>
+                      <input type="number" id="ano" class="form-control" min="1000" max="2099">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="edicao" class="form-label">Edição</label>
+                      <input type="text" id="edicao" class="form-control">
+                    </div>
+                  </div>
+                  <!-- Ajustado: ISBN removido, Idioma e Nacionalidade lado a lado -->
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="idioma" class="form-label">Idioma</label>
+                      <input type="text" id="idioma" class="form-control" value="Português">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="nacionalidadeAutor" class="form-label">Nacionalidade do Autor</label>
+                      <input type="text" id="nacionalidadeAutor" class="form-control">
+                    </div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="numeroPaginas" class="form-label">Páginas</label>
+                      <input type="number" id="numeroPaginas" class="form-control" min="1">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="paginasLidas" class="form-label">Páginas já lidas</label>
+                      <input type="number" id="paginasLidas" class="form-control" min="0" value="0" readonly disabled>
+                      <small class="text-muted">Calculado automaticamente (sessões + campos abaixo). Não editável.</small>
+                    </div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="paginasAnosAnteriores" class="form-label">Páginas lidas em anos anteriores</label>
+                      <input type="number" id="paginasAnosAnteriores" class="form-control" min="0" value="0">
+                      <small class="text-muted">Páginas lidas antes deste ano, sem sessão registrada (não contam na estatística do ano atual).</small>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="paginasExtra" class="form-label">Páginas lidas sem sessão registrada</label>
+                      <input type="number" id="paginasExtra" class="form-control" min="0" value="0">
+                      <small class="text-muted">Páginas lidas neste livro num ano específico, mas sem sessão detalhada.</small>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="paginasExtraAno" class="form-label">Ano dessas páginas extras</label>
+                      <input type="number" id="paginasExtraAno" class="form-control" min="2000" placeholder="Ex: 2026">
+                      <small class="text-muted">Deixe em branco se não usar o campo acima.</small>
+                    </div>
+                  </div>
+                  <!-- Datas -->
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="data-inicio" class="form-label">Data de início</label>
+                      <input type="date" id="data-inicio" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="data-termino" class="form-label">Data de término</label>
+                      <input type="date" id="data-termino" class="form-control">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-3">
+                <div class="card-header fw-bold">Classificação</div>
+                <div class="card-body">
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label for="genero" class="form-label">Gênero</label>
+                      <select id="genero" class="form-select"></select>
+                      <div class="form-text">Que tipo de livro é?</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="subgenero" class="form-label">Subgênero</label>
+                      <input type="text" id="subgenero" class="form-control" list="subgeneros-sugestoes" placeholder="Ex.: Fantasia" autocomplete="off">
+                      <datalist id="subgeneros-sugestoes"></datalist>
+                      <div class="form-text">De que estilo ou tema?</div>
+                    </div>
+                  </div>
+                  <div class="mb-3 mt-2">
+                    <label for="formato" class="form-label">Formato</label>
+                    <select id="formato" class="form-select">
+                      <option value="Físico">Físico</option>
+                      <option value="Kindle">Kindle</option>
+                      <option value="PDF">PDF</option>
+                      <option value="Audiobook">Audiobook</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" class="form-select">
+                      <option value="Quero ler">Quero ler</option>
+                      <option value="Lendo">Lendo</option>
+                      <option value="Finalizado">Finalizado</option>
+                      <option value="Abandonado">Abandonado</option>
+                      <option value="Relendo">Relendo</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coluna direita -->
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-header fw-bold">Capa e extras</div>
+                <div class="card-body text-center">
+                  <div id="cover-preview" class="mb-3 border rounded p-3 bg-light d-flex align-items-center justify-content-center" style="min-height: 250px;">
+                    <span class="text-muted">Pré-visualização</span>
+                  </div>
+                  <div class="input-group mb-3">
+                    <input type="url" id="urlCapa" class="form-control" placeholder="URL da imagem de capa">
+                    <button class="btn btn-outline-secondary" type="button" id="load-cover-btn"><i class="fas fa-sync-alt"></i></button>
+                  </div>
+                  <small class="text-muted">Cole o link direto da imagem</small>
+              
+                  <!-- Botão para abrir o App Drive no Android -->
+                  <div class="mt-2 pt-2 border-top">
+                    <small class="text-muted d-block mb-1">Ou digitalize a capa com o Google Drive:</small>
+                    <a href="https://drive.google.com/drive/folders/1Gn3UfUVWT4nrkgURWAPT7BZrRV2-tza7" 
+                     target="_blank" 
+                     class="btn btn-outline-secondary btn-sm">
+                    <i class="fab fa-google-drive"></i> Abrir no App Drive
+                  </a>
+                  </div>
+                </div>
+              </div>
+              <div class="card mb-3">
+                <div class="card-header fw-bold">Detalhes pessoais</div>
+                <div class="card-body">
+                  <!-- Tags e Preço removidos -->
+                  <div class="mb-3">
+                    <label for="observacoes" class="form-label">Observações</label>
+                    <textarea id="observacoes" class="form-control" rows="3"></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="nota" class="form-label">Nota (0-5)</label>
+                    <!-- A nota agora é um campo hidden + estrelas gerado via JS -->
+                    <input type="hidden" id="nota-hidden" value="0">
+                    <div id="nota-estrelas-container" class="d-flex align-items-center gap-1 mt-1">
+                      <!-- Preenchido pelo JavaScript -->
+                    </div>
+                  </div>
+                  <div class="mt-3 form-check">
+                    <input class="form-check-input" type="checkbox" id="favorito">
+                    <label class="form-check-label" for="favorito">Favorito</label>
+                  </div>
+                  <div class="mt-1 form-check">
+                    <input class="form-check-input" type="checkbox" id="classico">
+                    <label class="form-check-label" for="classico">Clássico</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botões de ação -->
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-outline-secondary" id="clear-form-btn">Limpar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Salvar Livro</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== PÁGINA: Registro de Leitura ==================== -->
+    <div id="page-leitura" class="page">
+      <div class="container py-4">
+        <h1 class="mb-4">Registro de Leitura</h1>
+
+        <!-- Seleção do livro -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Selecione o livro</h5>
+            <div class="input-group mb-2">
+              <input type="text" id="livro-select-input" class="form-control" list="livros-datalist" placeholder="Digite o nome do livro..." autocomplete="off" required>
+              <datalist id="livros-datalist"></datalist>
+              <button class="btn btn-outline-secondary" id="refresh-books-btn" title="Atualizar lista"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div id="livro-info" class="small text-muted"></div>
+          </div>
+        </div>
+
+        <!-- Formulário da sessão -->
+        <form id="session-form" novalidate>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header fw-bold">Data e horário</div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="data-sessao" class="form-label">Data *</label>
+                    <input type="date" id="data-sessao" class="form-control" required>
+                  </div>
+
+                  <!-- Cronômetro -->
+                  <div class="text-center mb-3">
+                    <span id="cronometro-display" class="fs-4 fw-bold text-primary">00:00</span>
+                    <div class="mt-2">
+                      <button id="btn-iniciar" class="btn btn-success btn-sm"><i class="fas fa-play"></i> Iniciar</button>
+                      <button id="btn-pausar" class="btn btn-warning btn-sm d-none"><i class="fas fa-pause"></i> Pausar</button>
+                      <button id="btn-retomar" class="btn btn-info btn-sm d-none"><i class="fas fa-play"></i> Retomar</button>
+                      <button id="btn-finalizar" class="btn btn-danger btn-sm d-none"><i class="fas fa-stop"></i> Finalizar</button>
+                    </div>
+                    <div class="mt-2">
+                      <button type="button" id="btn-buscar-palavra" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-buscar-palavra">
+                        <i class="fas fa-book-open"></i> Buscar palavra
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Campos de hora (ainda editáveis manualmente) -->
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label for="hora-inicio" class="form-label">Hora início</label>
+                      <input type="text" id="hora-inicio" class="form-control" inputmode="numeric" placeholder="HH:MM" maxlength="5" autocomplete="off">
+                    </div>
+                    <div class="col-6">
+                      <label for="hora-fim" class="form-label">Hora fim</label>
+                      <input type="text" id="hora-fim" class="form-control" inputmode="numeric" placeholder="HH:MM" maxlength="5" autocomplete="off">
+                    </div>
+                  </div>
+                  <div id="tempo-calculado" class="mt-2 small text-success d-none">
+                    <i class="fas fa-clock"></i> Tempo calculado: <span id="tempo-minutos">0</span> min
+                  </div>
+                  <!-- Guarda o tempo ativo do cronômetro (ms acumulados, já descontando
+                       pausas), convertido em minutos, para ser enviado junto no salvamento.
+                       Populado por leitura.js (cronômetro da própria página) e por leitor.js
+                       (cronômetro dentro do leitor de livros). Vazio = sem cronômetro usado
+                       nesta sessão (entrada 100% manual). -->
+                  <input type="hidden" id="tempo-ativo-minutos" value="">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header fw-bold">Páginas</div>
+                <div class="card-body">
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label for="pagina-inicial" class="form-label">Página inicial *</label>
+                      <input type="number" id="pagina-inicial" class="form-control" min="0" required>
+                    </div>
+                    <div class="col-6">
+                      <label for="pagina-final" class="form-label">Página final *</label>
+                      <input type="number" id="pagina-final" class="form-control" min="1" required>
+                    </div>
+                  </div>
+                  <div id="paginas-calculadas" class="mt-2 small text-success d-none">
+                    <i class="fas fa-book-open"></i> Páginas lidas: <span id="paginas-lidas">0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contexto + Anotação da sessão -->
+          <div class="card mt-3">
+            <div class="card-header fw-bold">Contexto e anotação (opcional)</div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-md-4">
+                  <label for="local-sessao" class="form-label">Local</label>
+                  <div class="input-group">
+                    <input type="text" id="local-sessao" class="form-control" list="locais-conhecidos-datalist" placeholder="Ex: Quarto, Biblioteca" autocomplete="off">
+                    <button type="button" id="btn-local-gps" class="btn btn-outline-secondary" title="Usar minha localização atual">
+                      <i class="fas fa-location-crosshairs"></i>
+                    </button>
+                  </div>
+                  <datalist id="locais-conhecidos-datalist"></datalist>
+                  <div id="local-gps-status" class="form-text"></div>
+                </div>
+                <div class="col-md-4">
+                  <label for="humor" class="form-label">Humor</label>
+                  <div class="grupo-icones-opcoes" data-alvo="humor">
+                    <button type="button" class="btn-icone-opcao" data-valor="Feliz"><i class="fas fa-face-smile"></i><span>Feliz</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Neutro"><i class="fas fa-face-meh"></i><span>Neutro</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Triste"><i class="fas fa-face-sad-tear"></i><span>Triste</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Cansado"><i class="fas fa-face-tired"></i><span>Cansado</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Empolgado"><i class="fas fa-face-grin-stars"></i><span>Empolgado</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Relaxado"><i class="fas fa-spa"></i><span>Relaxado</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Reflexivo"><i class="fas fa-brain"></i><span>Reflexivo</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Irritado"><i class="fas fa-face-angry"></i><span>Irritado</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Emocionado"><i class="fas fa-heart"></i><span>Emocionado</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Confiante"><i class="fas fa-face-grin-wide"></i><span>Confiante</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Ansioso"><i class="fas fa-face-flushed"></i><span>Ansioso</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Entediado"><i class="fas fa-face-meh-blank"></i><span>Entediado</span></button>
+                  </div>
+                  <input type="hidden" id="humor">
+                </div>
+                <div class="col-md-4">
+                  <label for="clima" class="form-label">Clima</label>
+                  <div class="grupo-icones-opcoes" data-alvo="clima">
+                    <button type="button" class="btn-icone-opcao" data-valor="Calor"><i class="fas fa-sun"></i><span>Calor</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Frio"><i class="fas fa-temperature-low"></i><span>Frio</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Chuvoso"><i class="fas fa-cloud-rain"></i><span>Chuvoso</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Muito calor"><i class="fas fa-temperature-high"></i><span>Muito calor</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Muito frio"><i class="fas fa-snowflake"></i><span>Muito frio</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Ameno"><i class="fas fa-cloud-sun"></i><span>Ameno</span></button>
+                    <button type="button" class="btn-icone-opcao" data-valor="Tempestade"><i class="fas fa-bolt"></i><span>Tempestade</span></button>
+                  </div>
+                  <input type="hidden" id="clima">
+                </div>
+              </div>
+
+              <!-- Anotações da sessão (múltiplas) -->
+              <div class="mt-3">
+                <label class="form-label fw-bold"><i class="fa-solid fa-pen-clip"></i> Anotações da sessão</label>
+                <small class="text-muted d-block mb-2">Adicione quantas anotações quiser. Serão salvas automaticamente ao registrar a sessão.</small>
+
+                <!-- Container que recebe todos os itens de anotação -->
+                <div id="anotacoes-sessao-container"></div>
+
+                <!-- Botão para adicionar mais anotações -->
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btn-adicionar-anotacao">
+                  <i class="fas fa-plus"></i> Adicionar outra anotação
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-outline-secondary" id="clear-session-btn">Limpar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Registrar Sessão</button>
+          </div>
+        </form>
+        <!-- Template oculto para item de anotação (clonado dinamicamente) -->
+        <template id="template-anotacao-item">
+          <div class="anotacao-item border rounded p-2 mb-2 bg-light">
+            <div class="row g-2 mb-2">
+              <div class="col-md-3">
+                <select class="form-select tipo-obs" style="font-size:0.85rem;">
+                  <option value="">Tipo (opcional)</option>
+                  <option value="Geral">Geral</option>
+                  <option value="Reflexão">Reflexão</option>
+                  <option value="Personagem">Personagem</option>
+                  <option value="Enredo">Enredo</option>
+                  <option value="Citação">Citação</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <input type="text" class="form-control capitulo-obs" placeholder="Capítulo (opcional)" style="font-size:0.85rem;">
+              </div>
+              <div class="col-md-3">
+                <input type="number" class="form-control pagina-obs" placeholder="Página" min="1" style="font-size:0.85rem;">
+              </div>
+              <div class="col-md-3 text-end">
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remover-anotacao" title="Remover esta anotação">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="input-group">
+              <textarea class="form-control texto-obs" rows="2" placeholder="Alguma nota sobre esta sessão..." style="font-size:0.85rem;"></textarea>
+              <button class="btn btn-outline-secondary btn-voz-obs" type="button" title="Ditar observação">
+                <i class="fas fa-microphone"></i>
+              </button>
+              <button class="btn btn-outline-secondary btn-ocr-obs" type="button" title="Escanear página do livro">
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
+          </div>
+        </template>
+        <div class="mt-5">
+          <h5>Histórico de Sessões</h5>
+          <div id="historico-sessoes"></div>
+        </div>
+      </div>
+    </div>
+    <!-- ==================== PÁGINA: Estatísticas ==================== -->
+<div id="page-estatisticas" class="page">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h1 class="mb-0">Estatísticas</h1>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <select id="estatisticas-ano-select" class="form-select form-select-sm w-auto" title="Ver resumo de um ano específico"></select>
+        <button type="button" class="btn btn-outline-primary" id="btn-ver-retrospectiva">
+          <i class="fas fa-star me-1"></i> Retrospectiva do ano
+        </button>
+      </div>
+    </div>
+   
+    <!-- Cards resumo (4 cards, 2 por linha em médio) -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <i class="fas fa-book fa-2x text-primary mb-2"></i>
+            <h5 id="stat-total-livros">0</h5>
+            <small>Livros finalizados</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <i class="fas fa-file-alt fa-2x text-success mb-2"></i>
+            <h5 id="stat-total-paginas">0</h5>
+            <small>Páginas lidas</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+            <h5 id="stat-total-horas">0</h5>
+            <small>Horas de leitura</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center shadow-sm">
+          <div class="card-body">
+            <i class="fas fa-tachometer-alt fa-2x text-danger mb-2"></i>
+            <h5 id="stat-velocidade">0</h5>
+            <small>Páginas/hora</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights gerais -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-lightbulb text-warning me-2"></i>Percepções</div>
+      <div class="card-body" id="insights-container">
+        <ul class="list-group list-group-flush" id="insights-list"></ul>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS PRINCIPAIS (5 gráficos + mapa de calor, 2 por linha) -->
+<div class="row g-3">
+  <!-- Linha 1 -->
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-book me-2"></i>Livros finalizados por mês <span id="titulo-ano-finalizados-mes"></span></div>
+      <div class="card-body">
+        <canvas id="grafico-finalizados-mes" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-file-alt me-2"></i>Páginas lidas (últimos 30 dias)</div>
+      <div class="card-body">
+        <canvas id="grafico-paginas-dia" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linha 2 -->
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-layer-group me-2"></i>Distribuição por gênero <span id="titulo-ano-generos"></span></div>
+      <div class="card-body">
+        <canvas id="grafico-generos" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-tags me-2"></i>Distribuição por subgênero <span id="titulo-ano-subgeneros"></span></div>
+      <div class="card-body">
+        <canvas id="grafico-subgeneros" height="200"></canvas>
+        <p id="subgeneros-vazio" class="text-muted small text-center my-4" style="display:none;">Nenhum livro finalizado neste ano tem subgênero preenchido.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold"><i class="fas fa-calendar-week me-2"></i>Tempo de leitura por dia da semana <span id="titulo-ano-dia-semana"></span></div>
+      <div class="card-body">
+        <canvas id="grafico-dia-semana" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linha 3 (Evolução da Velocidade) -->
+  <div class="col-12">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-bold"><i class="fas fa-gauge-high me-2"></i>Evolução da Velocidade (páginas/hora) <span id="titulo-ano-velocidade"></span></div>
+      <div class="card-body">
+        <canvas id="grafico-velocidade-mensal" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+    <!-- Top Autores e Editoras (2 colunas, lado a lado) -->
+    <div class="row g-3 mt-3">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold"><i class="fas fa-feather-pointed me-2"></i>Top Autores</div>
+          <div class="card-body">
+            <ul class="list-group" id="top-autores"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold"><i class="fas fa-building me-2"></i>Top Editoras</div>
+          <div class="card-body">
+            <ul class="list-group" id="top-editoras"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 5 Dias de Leitura (linha inteira) -->
+    <div class="row g-3 mt-1">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold"><i class="fas fa-ranking-star me-2"></i>Top 5 Dias de Leitura <span id="titulo-ano-top-dias"></span></div>
+          <div class="card-body">
+            <ul class="list-group" id="top-dias-leitura"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendário de Leitura (linha inteira) -->
+    <div class="col-12 mt-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fa-solid fa-calendar-days"></i> Calendário de Leitura</h5>
+            <div>
+              <button id="calendario-mes-anterior" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-left"></i></button>
+              <span id="calendario-mes-ano" class="mx-2 fw-bold"></span>
+              <button id="calendario-mes-proximo" class="btn btn-sm btn-outline-secondary"><i class="fas fa-chevron-right"></i></button>
+              <button id="btn-compartilhar-calendario" class="btn btn-sm btn-outline-primary ms-2" title="Baixar imagem do calendário"><i class="fas fa-camera"></i></button>
+            </div>
+          </div>
+          <div class="row row-cols-7 text-center fw-bold small mb-2" style="color: var(--text-secondary);">
+            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+          </div>
+          <div id="calendario-grid" class="row row-cols-7 g-1">
+            <!-- Preenchido dinamicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS AVANÇADOS (com gráficos de velocidade em 3 colunas) -->
+    <div class="col-12 mt-4">
+      <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+          <i class="fas fa-brain me-2"></i>Insights Avançados (Hábitos de Leitura)
+        </div>
+        <div class="card-body">
+          <!-- Mensagens textuais -->
+          <ul class="list-group list-group-flush mb-4" id="insights-avancados-list">
+            <li class="list-group-item text-muted">Carregando insights personalizados...</li>
+          </ul>
+
+          <!-- Abas: antes tudo (4 gráficos + 7 tabelas) ficava empilhado num
+               scroll só; agora cada recorte de dados fica na sua aba -->
+          <ul class="nav nav-tabs mb-3" id="tabs-insights-avancados" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="tab-btn-velocidade" data-bs-toggle="tab" data-bs-target="#tab-velocidade" type="button" role="tab">Velocidade</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-btn-humor-clima" data-bs-toggle="tab" data-bs-target="#tab-humor-clima" type="button" role="tab">Humor &amp; Clima</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-btn-locais-generos" data-bs-toggle="tab" data-bs-target="#tab-locais-generos" type="button" role="tab">Locais &amp; Gêneros</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-btn-anotacoes" data-bs-toggle="tab" data-bs-target="#tab-anotacoes" type="button" role="tab">Anotações</button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="conteudo-insights-avancados">
+            <!-- Aba: Velocidade -->
+            <div class="tab-pane fade show active" id="tab-velocidade" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="small text-muted">Velocidade por Gênero</h6>
+                  <canvas id="grafico-velocidade-genero" height="150"></canvas>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted">Velocidade por Período</h6>
+                  <canvas id="grafico-velocidade-periodo" height="150"></canvas>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted">Velocidade por Humor</h6>
+                  <canvas id="grafico-velocidade-humor" height="150"></canvas>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted">Velocidade por Duração</h6>
+                  <canvas id="grafico-velocidade-duracao" height="150"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aba: Humor & Clima -->
+            <div class="tab-pane fade" id="tab-humor-clima" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-cloud-sun me-2"></i> Distribuição por Clima</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-clima">
+                      <thead><tr><th>Clima</th><th>Sessões</th><th>Duração</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-masks-theater me-2"></i> Nota Média por Humor</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-nota-humor">
+                      <thead><tr><th>Humor</th><th>Nota</th><th>Sessões</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aba: Locais & Gêneros -->
+            <div class="tab-pane fade" id="tab-locais-generos" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-location-dot me-2"></i> Velocidade por Local</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-local-velocidade">
+                      <thead><tr><th>Local</th><th>Velocidade</th><th>Duração</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-ban me-2"></i> Taxa de Abandono por Gênero</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-abandono-genero">
+                      <thead><tr><th>Gênero</th><th>Finaliz.</th><th>Aband.</th><th>%</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-star me-2"></i> Nota Média por Gênero</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-nota-genero">
+                      <thead><tr><th>Gênero</th><th>Nota</th><th>Livros</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-calendar-days me-2"></i> Dias Médios por Gênero</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-dias-genero">
+                      <thead><tr><th>Gênero</th><th>Dias</th><th>Livros</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aba: Anotações -->
+            <div class="tab-pane fade" id="tab-anotacoes" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="small text-muted"><i class="fas fa-pen-fancy me-2"></i> Densidade de Anotações</h6>
+                  <div style="max-height: 260px; overflow-y: auto;">
+                    <table class="table table-sm table-striped mb-0" id="tabela-densidade-anotacoes">
+                      <thead><tr><th>Gênero</th><th>Anot./100 pág</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapa de Locais de Leitura -->
+    <div class="col-12 mt-4">
+      <div class="card shadow-sm">
+        <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-map-marker-alt me-2"></i>Mapa de Locais de Leitura</span>
+          <button id="btn-atualizar-mapa" class="btn btn-sm btn-outline-secondary" title="Atualizar mapa">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div id="mapa-locais" style="height: 450px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+   <!-- ==================== FIM DA PÁGINA ESTATÍSTICAS ==================== -->
+</div>
+
+<div id="page-metas" class="page">
+      <div class="container py-4">
+        <h1 class="mb-4">Metas e Conquistas</h1>
+
+        <!-- Metas -->
+        <div class="card mb-4 shadow-sm">
+          <div class="card-header fw-bold"><i class="fas fa-bullseye me-2"></i>Definir Metas</div>
+          <div class="card-body">
+            <form id="metas-form">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="meta-ano" class="form-label">Ano</label>
+                  <input type="number" id="meta-ano" class="form-control" min="2020" max="2100" required>
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-livros" class="form-label">Meta de livros</label>
+                  <input type="number" id="meta-livros" class="form-control" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-paginas" class="form-label">Meta de páginas</label>
+                  <input type="number" id="meta-paginas" class="form-control" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-mensal" class="form-label">Meta mensal (páginas)</label>
+                  <input type="number" id="meta-mensal" class="form-control" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-semanal" class="form-label">Meta semanal (páginas)</label>
+                  <input type="number" id="meta-semanal" class="form-control" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-diaria" class="form-label">Meta diária (páginas)</label>
+                  <input type="number" id="meta-diaria" class="form-control" min="0">
+                </div>
+                <div class="col-md-4">
+                  <label for="meta-sequencia" class="form-label">Meta de sequência (dias seguidos lendo)</label>
+                  <input type="number" id="meta-sequencia" class="form-control" min="0" placeholder="Ex: 30">
+                  <small class="text-muted">Compara com seu recorde de dias seguidos, não com a sequência de hoje.</small>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-save me-1"></i>Salvar Metas</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Progresso -->
+        <div class="row g-3 mb-4" id="progresso-container">
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h5>Progresso anual de livros</h5>
+                <div class="progress-ring-wrapper mx-auto">
+                  <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+                    <circle class="progress-ring-fill ring-livros" id="prog-livros" cx="60" cy="60" r="52"></circle>
+                  </svg>
+                  <div class="progress-ring-label" id="prog-livros-label">0%</div>
+                </div>
+                <span id="texto-prog-livros">0 de 0 livros</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h5>Progresso anual de páginas</h5>
+                <div class="progress-ring-wrapper mx-auto">
+                  <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+                    <circle class="progress-ring-fill ring-paginas" id="prog-paginas" cx="60" cy="60" r="52"></circle>
+                  </svg>
+                  <div class="progress-ring-label" id="prog-paginas-label">0%</div>
+                </div>
+                <span id="texto-prog-paginas">0 de 0 páginas</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5>Meta mensal</h5>
+                <p id="info-meta-mensal">Faltam 0 páginas para bater a meta mensal. Leia 0 páginas por dia.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12" id="card-prog-sequencia" style="display:none;">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h5><i class="fas fa-fire text-orange me-1"></i>Sequência de dias</h5>
+                <div class="progress-ring-wrapper mx-auto">
+                  <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="52"></circle>
+                    <circle class="progress-ring-fill ring-sequencia" id="prog-sequencia" cx="60" cy="60" r="52"></circle>
+                  </svg>
+                  <div class="progress-ring-label" id="prog-sequencia-label">0%</div>
+                </div>
+                <span id="texto-prog-sequencia">0 de 0 dias (recorde)</span>
+                <br><small class="text-muted" id="texto-sequencia-atual"></small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conquistas -->
+        <div class="card shadow-sm">
+          <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-trophy me-2"></i>Conquistas</span>
+            <button class="btn btn-sm btn-outline-primary" id="verificar-conquistas-btn">Verificar novas</button>
+          </div>
+          <div class="card-body">
+            <div class="row g-3" id="conquistas-grid">
+              <!-- Carregado dinamicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-bingo" class="page">
+      <div class="container py-4">
+        <h1 class="mb-3">Bingo Literário</h1>
+        <p class="text-muted mb-3">Escolha um dos quatro temas e sorteie um desafio. Depois de sortear um tema, ele fica bloqueado até você sortear os outros três — assim os temas sempre se revezam.</p>
+        <div id="bingo-resumo-geral"></div>
+        <div class="row g-3" id="bingo-temas-grid"></div>
+      </div>
+    </div>
+
+    <div id="page-jornada" class="page">
+      <div class="container py-4">
+        <h1 class="mb-1"><i class="fas fa-compass me-2"></i>Jornada de leitura</h1>
+        <p class="text-muted mb-3">O caminho da sua leitura ao longo do tempo — sessões, anotações, livros e conquistas, tudo num só lugar.</p>
+
+        <div id="jornada-grafico-mensal-container">
+          <h6 class="mb-2" id="jornada-grafico-titulo">Sua jornada</h6>
+          <div style="height: 180px;">
+            <canvas id="jornada-grafico-mensal"></canvas>
+          </div>
+        </div>
+
+        <div class="jornada-filtros">
+          <select class="form-select form-select-sm" id="jornada-filtro-tipo" aria-label="Filtrar por tipo de evento">
+            <option value="todos">Todos</option>
+            <option value="leituras">Leituras</option>
+            <option value="anotacoes">Anotações</option>
+            <option value="conquistas">Conquistas</option>
+            <option value="metas">Metas</option>
+          </select>
+          <select class="form-select form-select-sm" id="jornada-filtro-periodo" aria-label="Filtrar por período">
+            <option value="ultimos30">Últimos 30 dias</option>
+            <option value="ano" selected>Este ano</option>
+            <option value="anoAnterior">Ano anterior</option>
+            <option value="todos">Todos</option>
+            <option value="personalizado">Período personalizado</option>
+          </select>
+          <select class="form-select form-select-sm" id="jornada-ano-select" aria-label="Escolher ano"></select>
+          <div id="jornada-periodo-personalizado" class="d-none">
+            <input type="date" class="form-control form-control-sm" id="jornada-periodo-inicio" aria-label="Data inicial">
+            <span class="text-muted small">até</span>
+            <input type="date" class="form-control form-control-sm" id="jornada-periodo-fim" aria-label="Data final">
+          </div>
+        </div>
+
+        <div class="jornada-timeline" id="jornada-geral-container"></div>
+        <div class="jornada-vazio d-none" id="jornada-geral-vazio">Nenhuma atividade encontrada para esse filtro.</div>
+        <div id="jornada-geral-sentinela" class="text-center py-2 d-none">
+          <div class="spinner-border spinner-border-sm text-secondary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+        </div>
+        <div class="jornada-fim d-none" id="jornada-geral-fim">Fim da jornada.</div>
+      </div>
+    </div>
+
+    <div id="page-anotacoes" class="page">
+      <div class="container py-4 d-flex flex-column" style="height: 100%;">
+        <h1 class="mb-4">Anotações</h1>
+
+        <ul class="nav nav-tabs mb-3" id="anotacoesTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-anotacoes" data-bs-toggle="tab" data-bs-target="#painel-anotacoes" type="button" role="tab">Anotações</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-grifos" data-bs-toggle="tab" data-bs-target="#painel-grifos" type="button" role="tab"><i class="fas fa-highlighter me-1"></i>Grifos</button>
+          </li>
+        </ul>
+
+        <div class="tab-content flex-grow-1" style="min-height: 0;">
+          <div class="tab-pane fade show active h-100" id="painel-anotacoes" role="tabpanel">
+            <div class="d-flex flex-column h-100">
+              <!-- Área de pesquisa (desktop: topo; mobile: fixo no rodapé) -->
+              <div class="search-wrapper mb-3">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="fas fa-search"></i></span>
+                  <input type="text" id="anotacoes-search" class="form-control" placeholder="Pesquisar por palavra-chave...">
+                </div>
+              </div>
+
+              <!-- Lista de anotações -->
+              <div id="lista-anotacoes" class="flex-grow-1 overflow-auto">
+                <!-- Preenchido dinamicamente -->
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade h-100" id="painel-grifos" role="tabpanel">
+            <div class="d-flex flex-column h-100">
+              <p class="text-muted small mb-2">Trechos grifados no leitor (EPUB e PDF), agrupados por livro.</p>
+              <div id="lista-grifos" class="flex-grow-1 overflow-auto">
+                <!-- Preenchido dinamicamente -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-desejos" class="page">
+      <div class="container py-4">
+        <ul class="nav nav-tabs mb-4" id="desejosTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="wishlist-tab" data-bs-toggle="tab" data-bs-target="#wishlist-painel" type="button" role="tab">Lista de Desejos</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="emprestimos-tab" data-bs-toggle="tab" data-bs-target="#emprestimos-painel" type="button" role="tab">Empréstimos</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Painel Desejos -->
+          <div class="tab-pane fade show active" id="wishlist-painel" role="tabpanel">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <div class="card shadow-sm">
+                  <div class="card-header fw-bold">Adicionar à Lista de Desejos</div>
+                  <div class="card-body">
+                    <form id="form-desejo">
+                      <div class="mb-3">
+                        <label for="desejo-titulo" class="form-label">Título *</label>
+                        <input type="text" id="desejo-titulo" class="form-control" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="desejo-autor" class="form-label">Autor</label>
+                        <input type="text" id="desejo-autor" class="form-control">
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <label for="desejo-prioridade" class="form-label">Prioridade</label>
+                          <select id="desejo-prioridade" class="form-select">
+                            <option value="Alta">Alta</option>
+                            <option value="Média" selected>Média</option>
+                            <option value="Baixa">Baixa</option>
+                          </select>
+                        </div>
+                        <div class="col-6">
+                          <label for="desejo-preco" class="form-label">Preço</label>
+                          <input type="text" id="desejo-preco" class="form-control" placeholder="R$ 0,00" autocomplete="off">
+                        </div>
+                      </div>
+                      <div class="mt-2 mb-3">
+                        <label for="desejo-link" class="form-label">Link</label>
+                        <input type="url" id="desejo-link" class="form-control">
+                      </div>
+                      <div class="mb-3">
+                        <label for="desejo-onde-comprar" class="form-label">Onde comprar</label>
+                        <input type="text" id="desejo-onde-comprar" class="form-control" placeholder="Amazon, Livraria...">
+                      </div>
+                      <div class="mb-3">
+                        <label for="desejo-obs" class="form-label">Observações</label>
+                        <textarea id="desejo-obs" class="form-control" rows="2"></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Adicionar Desejo</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-7">
+                <h5>Meus Desejos</h5>
+                <div id="lista-desejos">
+                  <!-- Preenchido dinamicamente -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Painel Empréstimos -->
+          <div class="tab-pane fade" id="emprestimos-painel" role="tabpanel">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <div class="card shadow-sm">
+                  <div class="card-header fw-bold">Registrar Empréstimo</div>
+                  <div class="card-body">
+                    <form id="form-emprestimo">
+                      <div class="mb-3">
+                        <label for="emprestimo-livro" class="form-label">Livro *</label>
+                        <select id="emprestimo-livro" class="form-select" required>
+                          <option value="">Selecione um livro da sua biblioteca...</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="emprestimo-para" class="form-label">Para quem *</label>
+                        <input type="text" id="emprestimo-para" class="form-control" required>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <label for="emprestimo-data" class="form-label">Data do empréstimo</label>
+                          <input type="date" id="emprestimo-data" class="form-control">
+                        </div>
+                        <div class="col-6">
+                          <label for="emprestimo-previsao" class="form-label">Previsão de devolução</label>
+                          <input type="date" id="emprestimo-previsao" class="form-control">
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary mt-3">Registrar</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-7">
+                <h5>Empréstimos</h5>
+                <div id="lista-emprestimos">
+                  <!-- Preenchido dinamicamente -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-exportar" class="page">
+      <div class="container py-4">
+        <h1 class="mb-4">Exportar Dados e Relatórios</h1>
+
+        <div class="row g-4">
+          <!-- Exportação de dados brutos -->
+          <div class="col-lg-6">
+            <div class="card shadow-sm">
+              <div class="card-header fw-bold"><i class="fas fa-download me-2"></i>Exportar Dados</div>
+              <div class="card-body">
+                <form id="form-exportar">
+                  <div class="mb-3">
+                    <label class="form-label">Tipo de dados</label>
+                    <select id="export-tipo" class="form-select">
+                      <option value="livros">Livros</option>
+                      <option value="sessoes">Sessões de leitura</option>
+                      <option value="anotacoes">Anotações</option>
+                      <option value="citacoes">Citações</option>
+                      <option value="tudo">Todos os dados (JSON)</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Formato</label>
+                    <select id="export-formato" class="form-select">
+                      <option value="csv">CSV</option>
+                      <option value="json">JSON</option>
+                      <option value="markdown">Markdown</option>
+                      <option value="txt">TXT</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-file-export me-1"></i>Baixar Arquivo</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Relatório -->
+          <div class="col-lg-6">
+            <div class="card shadow-sm">
+              <div class="card-header fw-bold"><i class="fas fa-chart-bar me-2"></i>Relatório de Leitura</div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">Período</label>
+                  <select id="relatorio-periodo" class="form-select">
+                    <option value="mensal">Mensal (atual)</option>
+                    <option value="anual">Anual (atual)</option>
+                  </select>
+                </div>
+                <button id="btn-gerar-relatorio" class="btn btn-success"><i class="fas fa-file-alt me-1"></i>Gerar Relatório</button>
+                <div id="relatorio-preview" class="mt-3 d-none">
+                  <h5>Pré-visualização</h5>
+                  <pre id="relatorio-conteudo" class="p-3 bg-light rounded" style="max-height: 300px; overflow-y: auto;"></pre>
+                  <button id="btn-baixar-relatorio" class="btn btn-outline-primary mt-2"><i class="fas fa-download"></i> Baixar TXT</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+        <div id="page-configuracoes" class="page">
+    <div class="container py-4">
+      <h1 class="mb-4">Configurações</h1>
+
+      <!-- Perfil -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold"><i class="fas fa-user-circle me-2"></i>Meu perfil</div>
+        <div class="card-body">
+          <form id="form-perfil">
+            <div class="perfil-topo">
+              <img id="perfil-previa" class="perfil-previa" alt="Prévia do ícone" width="72" height="72">
+              <div>
+                <div id="perfil-previa-nome" class="fw-bold"></div>
+                <small class="text-muted">Conta: <span id="perfil-email"></span></small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="perfil-nome" class="form-label">Nome do meu app</label>
+              <input type="text" id="perfil-nome" class="form-control" maxlength="30" placeholder="Ex.: Minha Estante">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Ícone</label>
+              <div id="perfil-emojis" class="perfil-emojis"></div>
+              <div class="mt-2">
+                <label for="perfil-foto" class="btn btn-outline-secondary btn-sm mb-0"><i class="fas fa-image me-1"></i>Usar uma foto minha</label>
+                <input type="file" id="perfil-foto" accept="image/*" hidden>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Cor de fundo do ícone</label>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div id="perfil-cores" class="perfil-cores"></div>
+                <input type="color" id="perfil-cor-livre" class="form-control form-control-color" title="Outra cor">
+              </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button type="submit" id="perfil-salvar" class="btn btn-primary"><i class="fas fa-save me-1"></i>Salvar perfil</button>
+              <button type="button" id="btn-sair" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt me-1"></i>Sair da conta</button>
+            </div>
+            <small class="text-muted d-block mt-2">Para o nome e o ícone mudarem também na tela inicial do celular, remova o app e adicione de novo.</small>
+          </form>
+        </div>
+      </div>
+
+      <!-- Aparência -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold"><i class="fas fa-palette me-2"></i>Aparência</div>
+        <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <span>Alternar entre modo claro e escuro</span>
+          <button id="theme-toggle" class="btn btn-outline-secondary">
+            <i class="fas fa-moon"></i> <span class="ms-1">Modo escuro</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preferências -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold"><i class="fas fa-sliders-h me-2"></i>Preferências</div>
+        <div class="card-body">
+          <form id="form-config">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="config-meta-livros" class="form-label">Meta anual de livros (padrão)</label>
+                <input type="number" id="config-meta-livros" class="form-control" min="0">
+              </div>
+              <div class="col-md-6">
+                <label for="config-meta-paginas" class="form-label">Meta anual de páginas (padrão)</label>
+                <input type="number" id="config-meta-paginas" class="form-control" min="0">
+              </div>
+              <div class="col-md-4">
+                <label for="config-cor" class="form-label">Cor principal</label>
+                <input type="color" id="config-cor" class="form-control form-control-color">
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" id="config-cor-automatica" checked>
+                  <label class="form-check-label small" for="config-cor-automatica">
+                    Usar cor automática por horário
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tema padrão</label>
+                <select id="config-tema" class="form-select">
+                  <option value="light">Claro</option>
+                  <option value="dark">Escuro</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label d-block">Lembrete de leitura</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="config-lembrete-leitura">
+                  <label class="form-check-label small" for="config-lembrete-leitura">
+                    Avisar se eu ainda não li hoje (ao abrir o app)
+                  </label>
+                </div>
+                <small class="text-muted d-block" id="config-lembrete-status"></small>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3"><i class="fas fa-save me-1"></i>Salvar Preferências</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cadastro de coordenadas para o mapa -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header fw-bold"><i class="fas fa-map-marker-alt me-2"></i>Coordenadas dos Locais</div>
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+              <label for="coord-local" class="form-label">Nome do Local</label>
+              <input type="text" id="coord-local" class="form-control" placeholder="Ex: Casa, Trabalho, Vitória...">
+              <small class="text-muted">Use exatamente o mesmo nome das sessões.</small>
+            </div>
+            <div class="col-md-5">
+              <label for="coord-valor" class="form-label">Latitude, Longitude</label>
+              <input type="text" id="coord-valor" class="form-control" placeholder="-20.3155,-40.3128">
+              <small class="text-muted">Formato: latitude,longitude</small>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100" id="btn-salvar-coordenada">
+                <i class="fas fa-save"></i> Salvar
+              </button>
+            </div>
+          </div>
+          <hr>
+          <h6>Locais já cadastrados</h6>
+          <ul id="lista-coordenadas" class="list-unstyled"></ul>
+        </div>
+      </div>
+
+      <!-- Backup e Restauração -->
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header fw-bold"><i class="fas fa-cloud-download-alt me-2"></i>Backup</div>
+            <div class="card-body">
+              <p>Baixe todos os seus dados em um arquivo JSON para manter uma cópia de segurança.</p>
+              <button id="btn-backup" class="btn btn-outline-primary"><i class="fas fa-download"></i> Baixar Backup</button>
+              <small id="backup-lembrete" class="d-block text-muted mt-2 d-none"></small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header fw-bold"><i class="fas fa-cloud-upload-alt me-2"></i>Restaurar Backup</div>
+            <div class="card-body">
+              <p>Selecione um arquivo de backup (.json) previamente salvo para restaurar todos os dados. <strong class="text-danger">Isso substituirá seus dados atuais!</strong></p>
+              <input type="file" id="input-restore" accept=".json" class="form-control mb-2">
+              <button id="btn-restore" class="btn btn-outline-danger" disabled><i class="fas fa-upload"></i> Restaurar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informações do sistema -->
+      <div class="card mt-4 shadow-sm">
+        <div class="card-header fw-bold"><i class="fas fa-info-circle me-2"></i>Informações do Sistema</div>
+        <div class="card-body">
+          <p><strong>Versão:</strong> 1.0.0</p>
+          <p><strong>Total de livros na biblioteca:</strong> <span id="info-total-livros">...</span></p>
+          <p><strong>Espaço estimado usado:</strong> <span id="info-espaco">...</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ==================== PÁGINA: Leitor ==================== -->
+    <div id="page-leitor" class="page d-flex flex-column" style="height: 100%;">
+
+      <!-- Barra superior do Leitor -->
+      <div class="leitor-topbar d-flex justify-content-between align-items-center px-3 py-2 bg-white border-bottom">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-sm btn-outline-secondary me-2" id="btn-voltar-biblioteca" title="Voltar">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <span id="leitor-titulo-livro" class="fw-bold text-truncate" style="max-width: 200px;">Nenhum livro aberto</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Cronômetro embutido -->
+          <span id="leitor-cronometro" class="fw-bold text-primary">00:00</span>
+          <button class="btn btn-sm btn-success" id="btn-leitor-iniciar" title="Iniciar cronômetro"><i class="fas fa-play"></i></button>
+          <button class="btn btn-sm btn-warning d-none" id="btn-leitor-pausar" title="Pausar"><i class="fas fa-pause"></i></button>
+          <button class="btn btn-sm btn-info d-none" id="btn-leitor-retomar" title="Retomar"><i class="fas fa-play"></i></button>
+          <button class="btn btn-sm btn-danger d-none" id="btn-leitor-finalizar" title="Finalizar leitura"><i class="fas fa-stop"></i></button>
+
+          <!-- Tela cheia -->
+          <button class="btn btn-sm btn-outline-secondary" id="btn-fullscreen-leitor" title="Tela cheia">
+            <i class="fas fa-expand"></i>
+          </button>
+
+          <!-- Configurações (Ajustes) -->
+          <button class="btn btn-sm btn-outline-secondary" id="btn-ajustes-leitor" data-bs-toggle="modal" data-bs-target="#modal-config-leitor" title="Ajustar visualização">
+            <i class="fas fa-text-height"></i>
+          </button>
+
+          <!-- Abrir EPUB -->
+          <button class="btn btn-outline-primary btn-sm" id="btn-trocar-epub" title="Abrir outro EPUB">
+            <i class="fas fa-folder-open"></i>
+          </button>
+
+          <!-- Índice -->
+          <button class="btn btn-sm btn-outline-secondary" id="btn-indice" data-bs-toggle="offcanvas" data-bs-target="#offcanvasIndice" title="Índice">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Área de leitura -->
+      <div id="leitor-container" class="flex-grow-1"></div>
+
+      <!-- Barra inferior de progresso -->
+      <div class="leitor-bottombar bg-white border-top px-3 py-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <small id="leitor-progresso-texto">0%</small>
+          <div class="progress flex-grow-1 mx-2" style="height:6px;">
+            <div class="progress-bar" id="leitor-barra-progresso" role="progressbar" style="width:0%;"></div>
+          </div>
+          <small><span id="leitor-pagina-atual">0</span> / <span id="leitor-total-paginas">0</span></small>
+        </div>
+      </div>
+
+      <!-- Input de arquivo oculto (necessário para os botões abrirem o seletor de arquivos) -->
+      <input type="file" id="input-leitor-arquivo" accept=".epub,.pdf,.docx" class="d-none">
+    </div>
+  </main>
+
+  <!-- Botão flutuante: adicionar livro (fora de .page/main para não herdar
+       o transform usado na transição de páginas, que quebraria o position:fixed) -->
+  <button type="button" id="btn-fab-adicionar-livro" class="fab-adicionar-livro" title="Adicionar livro" aria-label="Adicionar livro">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Offcanvas de índice do leitor (FORA do main) -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasIndice">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Índice</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul id="lista-indice" class="list-unstyled"></ul>
+    </div>
+  </div>
+
+  <!-- Modal de configurações do leitor (FORA do main) -->
+  <div class="modal fade" id="modal-config-leitor" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ajustes de Leitura</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="leitor-fonte" class="form-label fw-bold">Fonte do Texto</label>
+            <select id="leitor-fonte" class="form-select">
+              
+              <!-- SERIFADAS (Clássicas para livros) -->
+              <optgroup label="Serifadas (Estilo Livro)">
+                <option value="Georgia, serif">Georgia (Padrão de Sistema)</option>
+                <option value="'Merriweather', serif">Merriweather (Super legível)</option>
+                <option value="'Lora', serif">Lora (Elegante)</option>
+                <option value="'PT Serif', serif">PT Serif (Moderna)</option>
+                <option value="'Crimson Text', serif">Crimson Text (Especial para ficção)</option>
+                <option value="'Vollkorn', serif">Vollkorn (Robusta e clássica)</option>
+                <option value="'Playfair Display', serif">Playfair Display (Sofisticada)</option>
+              </optgroup>
+
+              <!-- SEM SERIFA (Limpas e modernas) -->
+              <optgroup label="Sem Serifa (Telas e Minimalista)">
+                <option value="'Open Sans', sans-serif">Open Sans (Muito clara)</option>
+                <option value="'Roboto', sans-serif">Roboto (Padrão Android)</option>
+                <option value="'Inter', sans-serif">Inter (Alta legibilidade)</option>
+                <option value="'Lato', sans-serif">Lato (Suave e harmoniosa)</option>
+                <option value="'Nunito', sans-serif">Nunito (Arredondada)</option>
+                <option value="'Montserrat', sans-serif">Montserrat (Moderna)</option>
+              </optgroup>
+
+              <!-- MONOSPAÇADA E ACESSIBILIDADE -->
+              <optgroup label="Especiais e Acessibilidade">
+                <option value="'Fira Code', monospace">Fira Code (Programação/Código)</option>
+                <option value="'OpenDyslexic', sans-serif">OpenDyslexic (Acessibilidade para Dislexia)</option>
+              </optgroup>
+
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tamanho da fonte</label>
+            <input type="range" class="form-range" id="leitor-tamanho-fonte" min="12" max="28" value="18" step="1">
+            <small><span id="leitor-valor-tamanho">18</span>px</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Espaçamento entre linhas</label>
+            <input type="range" class="form-range" id="leitor-espacamento" min="1.0" max="2.5" value="1.5" step="0.1">
+            <small><span id="leitor-valor-espacamento">1.5</span></small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Margens</label>
+            <input type="range" class="form-range" id="leitor-margem" min="0" max="15" value="5" step="1">
+            <small><span id="leitor-valor-margem">5</span>%</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tema</label>
+            <select id="leitor-tema" class="form-select">
+              <option value="claro">Claro</option>
+              <option value="sepia">Sépia</option>
+              <option value="escuro">Escuro</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Modo de rolagem</label>
+            <select id="leitor-modo-rolagem" class="form-select">
+              <option value="continuo">Contínuo</option>
+              <option value="paginado" selected>Paginado</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para buscar o significado de uma palavra durante a leitura -->
+  <div class="modal fade" id="modal-buscar-palavra" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Buscar palavra</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group mb-2">
+            <input type="text" id="palavra-buscar-input" class="form-control" placeholder="Digite ou fale a palavra..." autocomplete="off">
+            <button type="button" id="btn-voz-palavra" class="btn btn-outline-secondary" title="Falar a palavra">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="button" id="btn-confirmar-busca-palavra" class="btn btn-primary" title="Buscar">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <div id="resultado-busca-palavra" class="small"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para edição do texto escaneado via OCR -->
+  <div class="modal fade" id="modal-ocr-edicao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar texto capturado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <textarea id="ocr-texto-editavel" class="form-control" rows="10" style="font-family: 'Georgia', serif; font-size: 1rem;"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btn-confirmar-ocr">Confirmar e inserir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de detalhes do livro (FORA do main) -->
+  <div class="modal fade" id="livro-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-titulo">Detalhes do Livro</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" id="modal-conteudo">
+          <!-- Preenchido dinamicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Compartilhamento de Citação (FORA do main) -->
+  <div class="modal fade" id="modal-compartilhar-citacao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Personalizar Citação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- Coluna de controles -->
+            <div class="col-md-4">
+              <h6>🎨 Fundo</h6>
+              <div class="d-flex flex-wrap gap-2 mb-3" id="cores-predefinidas"></div>
+              <button class="btn btn-sm btn-outline-secondary w-100 mb-2" id="btn-fundo-capa">
+                <i class="fas fa-image"></i> Usar capa do livro
+              </button>
+              <button class="btn btn-sm btn-outline-secondary w-100 mb-3" id="btn-fundo-gradiente">
+                <i class="fas fa-fill-drip"></i> Gradiente aleatório
+              </button>
+                
+              <h6>🔤 Texto</h6>
+              <div class="mb-2">
+                <label class="form-label small">Tamanho da fonte</label>
+                <input type="range" class="form-range" id="range-tamanho-fonte" min="12" max="28" value="18">
+              </div>
+              <div class="mb-2">
+                <label class="form-label small">Alinhamento</label>
+                <div class="btn-group w-100">
+                  <button class="btn btn-sm btn-outline-secondary active" data-align="center">Centro</button>
+                  <button class="btn btn-sm btn-outline-secondary" data-align="left">Esquerda</button>
+                  <button class="btn btn-sm btn-outline-secondary" data-align="right">Direita</button>
+                </div>
+              </div>
+  
+              <h6 class="mt-3">📐 Formato</h6>
+              <div class="btn-group w-100" id="btn-group-formato">
+                <button class="btn btn-sm btn-outline-secondary active" data-format="feed">Feed (1:1)</button>
+                <button class="btn btn-sm btn-outline-secondary" data-format="stories">Stories (9:16)</button>
+              </div>
+            </div>
+  
+            <!-- Pré-visualização do cartão -->
+            <div class="col-md-8">
+              <div id="cartao-citacao" style="padding: 2rem; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #fff; min-height: 350px; display: flex; flex-direction: column; justify-content: center; text-align: center; font-family: 'Georgia', serif; transition: background 0.3s, color 0.3s; position: relative; overflow: hidden;">
+                <div id="citacao-texto" contenteditable="true" style="font-size: 1.3rem; font-style: italic; margin-bottom: 1.5rem; line-height: 1.6; outline: none; z-index: 2; position: relative;"></div>
+                <div style="margin-top: auto; z-index: 2; position: relative;">
+                  <p id="citacao-livro" contenteditable="true" style="font-weight: bold; margin-bottom: 0.25rem; outline: none;"></p>
+                  <p id="citacao-autor" contenteditable="true" style="opacity: 0.7; font-size: 0.9rem; outline: none;"></p>
+                </div>
+                <div id="citacao-logo" style="margin-top: 2rem; text-align: center; z-index: 2; position: relative;">
+                  <img src="img/icons/logo.png" data-app-logo alt="" style="width: 40px; height: auto; opacity: 0.9; border-radius: 8px;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btn-baixar-citacao">
+            <i class="fas fa-download"></i> Baixar Imagem
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal Associar EPUB (deve ficar no final do body) -->
+  <div class="modal fade" id="modalAssociarEpub" tabindex="-1" aria-labelledby="modalAssociarEpubLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAssociarEpubLabel">Associar EPUB à Biblioteca</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small mb-3">
+            Este EPUB não foi vinculado a nenhum livro da sua biblioteca. Selecione um livro abaixo ou crie um novo registro.
+          </p>
+          
+          <!-- Lista de Livros Sugeridos -->
+          <div class="list-group mb-3" id="listaLivrosParaVincular" style="max-height: 200px; overflow-y: auto;">
+            <!-- Preenchido via JavaScript -->
+          </div>
+
+          <hr>
+
+          <!-- Botão para Criar Novo (SEM data-bs-dismiss) -->
+          <div class="d-grid">
+            <button type="button" class="btn btn-primary" id="btnCriarNovoLivroEpub">
+              <i class="fas fa-plus-circle me-2"></i>Criar Novo Livro com estes dados
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="modal-busca-global" tabindex="-1" aria-labelledby="modalBuscaGlobalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalBuscaGlobalLabel"><i class="fas fa-search me-2"></i>Busca global</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="busca-global-input" class="form-control mb-3" placeholder="Buscar em livros, anotações e desejos...">
+          <div id="busca-global-resultados" style="max-height: 60vh; overflow-y: auto;">
+            <div class="text-center text-muted py-3">Digite para buscar em livros, anotações, citações e desejos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal da Retrospectiva do Ano -->
+  <div class="modal fade" id="modal-retrospectiva" tabindex="-1" aria-labelledby="modalRetrospectivaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalRetrospectivaLabel"><i class="fas fa-star me-2"></i>Retrospectiva</h5>
+          <select id="retrospectiva-ano-select" class="form-select form-select-sm ms-auto me-2" style="max-width: 110px;"></select>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" id="retrospectiva-corpo">
+          <!-- Preenchido dinamicamente -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btn-baixar-retrospectiva">
+            <i class="fas fa-download"></i> Baixar imagem
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dependências -->
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/bingo-dados.js"></script>
+  <script src="js/seletor-icones.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/perfil.js"></script>
+
+  <!-- Módulos -->
+  <script src="js/db.js"></script>
+  <script src="js/fila-offline.js"></script>
+  <script src="js/classificacao.js"></script>
+  <script src="js/livros.js"></script>
+  <script src="js/ocr.js"></script>
+  <script src="js/leitura.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/biblioteca.js"></script>
+  <script src="js/estatisticas.js"></script>
+  <script src="js/retrospectiva.js"></script>
+  <script src="js/calendario.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/mapa.js"></script> 
+  <script src="js/metas.js"></script>
+  <script src="js/bingo.js"></script>
+  <script src="js/jornada.js"></script>
+  <script src="js/anotacoes.js"></script>
+  <script src="js/desejos.js"></script>
+  <script src="js/exportar.js"></script>
+  <script src="js/configuracoes.js"></script>
+  <script src="js/tema-sazonal.js"></script>
+  <script src="js/sync-status.js"></script>
+  <script src="js/lembretes.js"></script>
+  <script src="js/busca-global.js"></script>
+
+  <!-- Tesseract.js para OCR -->
+  <script src='https://unpkg.com/tesseract.js@v5.0.4/dist/tesseract.min.js'></script>
+  <!-- Controlador principal (sempre por último) -->
+  <script src="js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.3/dist/quagga.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <audio id="audio-fantasma" src="audio/silencio.wav" loop preload="auto"></audio>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+  <script src="js/leitor.js"></script>
+  </body>
+</html>
