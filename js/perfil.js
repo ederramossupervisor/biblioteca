@@ -140,7 +140,8 @@ const Perfil = (() => {
 
     definirLink('icon', await iconeDataURL(p, 64));
     definirLink('apple-touch-icon', await iconeDataURL(p, 180));
-    await aplicarManifest(p);
+    // Manifest dinâmico (blob:) desativado: o Chrome do Android não consegue instalar o app
+    // a partir de um manifest que não tem endereço real. Usa-se o manifest.json fixo.
   }
 
   async function aplicarManifest(p) {

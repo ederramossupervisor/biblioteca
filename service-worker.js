@@ -1,6 +1,6 @@
 // Calixteca – Service Worker v19 (shell completo + cache sob demanda para libs pesadas + cache de imagens/capas)
-const CACHE_NAME = 'leituras-v1';
-const RUNTIME_CACHE_NAME = 'leituras-runtime-v1';
+const CACHE_NAME = 'leituras-v2';
+const RUNTIME_CACHE_NAME = 'leituras-runtime-v2';
 
 // App shell: tudo que o app precisa pra funcionar offline logo de cara.
 // Instalado eagerly (cache.addAll) — por isso fica restrito a recursos
