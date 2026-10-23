@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Nome, ícone, manifest do usuário (não bloqueia o carregamento dos dados)
-  Perfil.carregar().catch(() => {});
+  Perfil.initTela(); // liga os botões do card de perfil já no início
+  Perfil.carregar().then(() => Perfil.initTela()).catch(() => {});
 
   // Inicializa módulos básicos (independente da splash)
   initNavegacao();
@@ -187,8 +188,8 @@ function activatePageGlobal(pageName) {
       if (typeof Exportar !== 'undefined' && Exportar.init) Exportar.init();
       break;
     case 'configuracoes':
+      if (typeof Perfil !== 'undefined') { try { Perfil.initTela(); } catch (e) { console.error(e); } }
       if (typeof Configuracoes !== 'undefined' && Configuracoes.init) Configuracoes.init();
-      if (typeof Perfil !== 'undefined') Perfil.initTela();
       break;
   }
   // Fecha o offcanvas mobile se estiver aberto
