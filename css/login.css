@@ -1,8 +1,8 @@
 /* Tela de login / cadastro */
 .auth-overlay{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;
-  background:linear-gradient(160deg,#f2ebdc 0%,#e7dcc3 100%)}
+  background:#e7dcc3 url('../img/fundo-splash.png') center/cover no-repeat}
 .auth-overlay[hidden]{display:none}
-.auth-card{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:28px 24px;box-shadow:0 12px 40px rgba(0,0,0,.15)}
+.auth-card{width:100%;max-width:400px;background:rgba(255,255,255,.94);border-radius:18px;padding:28px 24px;box-shadow:0 12px 40px rgba(0,0,0,.15)}
 .auth-marca{text-align:center;margin-bottom:8px}
 .auth-marca img{border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .auth-titulo{font-size:1.5rem;text-align:center;margin:8px 0 4px;font-family:var(--font-display,inherit)}
