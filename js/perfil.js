@@ -140,35 +140,20 @@ const Perfil = (() => {
 
     definirLink('icon', await iconeDataURL(p, 64));
     definirLink('apple-touch-icon', await iconeDataURL(p, 180));
-    // Manifest dinâmico (blob:) desativado: o Chrome do Android não consegue instalar o app
-    // a partir de um manifest que não tem endereço real. Usa-se o manifest.json fixo.
+    aplicarManifest();
   }
 
-  async function aplicarManifest(p) {
+  // O manifest vem de uma função do Supabase (endereço real), com o nome e a foto do perfil.
+  // Assim o Chrome consegue instalar o app e ele leva o nome escolhido pela pessoa.
+  function aplicarManifest() {
+    const uid = (typeof Auth !== 'undefined' && Auth.id && Auth.id()) || null;
+    if (!uid) return;
     const base = location.origin + location.pathname.replace(/[^/]*$/, '');
-    const i192 = await iconeDataURL(p, 192);
-    const i512 = await iconeDataURL(p, 512);
-    const manifesto = {
-      name: p.nome_app,
-      short_name: p.nome_app.slice(0, 12),
-      description: p.nome_app + ' - seu diário de leitura',
-      start_url: base + 'index.html',
-      scope: base,
-      display: 'standalone',
-      background_color: '#f2ebdc',
-      theme_color: p.cor_primaria,
-      icons: [
-        { src: i192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: i512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-      ],
-      shortcuts: [
-        { name: 'Registrar Sessão', short_name: 'Sessão', url: base + 'index.html?page=leitura', icons: [{ src: i192, sizes: '192x192', type: 'image/png' }] },
-        { name: 'Adicionar Livro', short_name: 'Adicionar', url: base + 'index.html?page=adicionar', icons: [{ src: i192, sizes: '192x192', type: 'image/png' }] }
-      ]
-    };
-    if (manifestUrl) URL.revokeObjectURL(manifestUrl);
-    manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifesto)], { type: 'application/manifest+json' }));
-    definirLink('manifest', manifestUrl, 'app-manifest');
+    const href = `${SupabaseApp.URL}/functions/v1/leituras-manifest?u=${encodeURIComponent(uid)}&b=${encodeURIComponent(base)}&t=${Date.now()}`;
+    let link = document.getElementById('app-manifest') || document.querySelector('link[rel="manifest"]');
+    if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+    link.id = 'app-manifest';
+    link.href = href;
   }
 
   // ---------- tela em Configurações ----------
