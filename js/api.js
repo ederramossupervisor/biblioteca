@@ -295,6 +295,16 @@ const API = (() => {
     if (error) throw new Error(error.message);
     return (data || []).map(mapSessaoFull);
   }
+  // Última página lida de um livro (página final da sessão mais recente dele).
+  async function ultimaPaginaLivro(livroID) {
+    const { data, error } = await sb.from('sessoes').select('pagina_final')
+      .eq('livro_id', livroID)
+      .order('data', { ascending: false }).order('hora_inicio', { ascending: false })
+      .limit(1);
+    if (error) throw new Error(error.message);
+    const n = data && data[0] ? Number(data[0].pagina_final) : NaN;
+    return { pagina: Number.isFinite(n) ? n : null };
+  }
   async function _recalcularProgressoLivro(livroID, opcoes = {}) {
     const { data: sessoes, error } = await sb.from('sessoes').select('paginas_lidas,data').eq('livro_id', livroID);
     if (error) throw new Error(error.message);
@@ -1529,6 +1539,7 @@ const API = (() => {
       case 'importBackup': return importarBackup(dados.backup);
       case 'listAllSessions': return listarTodasSessoes();
       case 'listRecentSessions': return listarSessoesRecentes();
+      case 'ultimaPaginaLivro': return ultimaPaginaLivro(dados.livroID);
       case 'getSession': return obterSessaoPorId(dados.id);
       case 'updateBook': return atualizarLivro(dados.id, dados.book);
       case 'deleteBook': return excluirLivro(dados.id);

@@ -235,6 +235,7 @@ const Leitura = (() => {
     criarBotaoTempoMedio();
 
     livroInput.addEventListener('change', () => {
+      atualizarUltimaPagina();
       const texto = livroInput.value.trim();
       const id = livroMap[texto];
       if (id) {
@@ -833,6 +834,24 @@ const Leitura = (() => {
       Páginas totais: ${livroPadrao.NúmeroPáginas || '?'} | Status: ${livroPadrao.Status} | Lidas: ${livroPadrao.PáginasLidasAcumuladas || 0}
     `;
     atualizarMediaSession(livroPadrao);
+    atualizarUltimaPagina();
+  }
+
+  // Mostra, bem discreto, a última página lida do livro escolhido (abaixo da "Página inicial").
+  let tokenUltimaPagina = 0;
+  async function atualizarUltimaPagina() {
+    const caixa = document.getElementById('ultima-pagina-lida');
+    const valor = document.getElementById('ultima-pagina-valor');
+    if (!caixa || !valor) return;
+    const id = livroMap[livroInput.value.trim()];
+    const meuToken = ++tokenUltimaPagina;
+    if (!id) { caixa.hidden = true; return; }
+    try {
+      const r = await API.enviar({ acao: 'ultimaPaginaLivro', livroID: id });
+      if (meuToken !== tokenUltimaPagina) return; // escolheu outro livro enquanto buscava
+      if (r && r.pagina != null) { valor.textContent = r.pagina; caixa.hidden = false; }
+      else caixa.hidden = true;
+    } catch (e) { if (meuToken === tokenUltimaPagina) caixa.hidden = true; }
   }
 
   function calcularTempo() {
