@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setTimeout(esconderSplash, TEMPO_MAXIMO_SPLASH);
 
   // Portão de entrada: sem login, só aparece a tela de entrar/criar conta.
-  const emRecuperacao = /type=recovery/.test(location.hash);
+  const emRecuperacao = !!window.__RECUPERACAO__;
   const usuario = await Auth.init();
   if (!usuario) {
     // Perfil guardado deste aparelho (se houver) deixa a tela de login com a cara do app.
@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.classList.add('app-loaded');
     if (splash) splash.remove();
     Auth.mostrarTela(emRecuperacao ? 'nova-senha' : 'entrar');
+    if (window.__ERRO_LINK__ && !emRecuperacao) {
+      Auth.mostrarMensagem('Este link expirou ou já foi usado. Peça um novo em "Esqueci minha senha".');
+    }
     return;
   }
 

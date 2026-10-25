@@ -47,8 +47,10 @@ const Auth = (() => {
         // Outra conta entrou (ex.: em outra aba) depois de o cache local já ter
         // sido aberto para o usuário anterior: recarrega pra reabrir no lugar certo.
         // Só recarrega se o armazenamento local funciona (senão ficaria em loop).
+        // Veio do link de redefinir senha: não entra no app nem recarrega; mostra a tela de nova senha.
+        if (window.__RECUPERACAO__) return null;
         const armazenamentoOk = localStorage.getItem(UID_KEY) === u.id;
-        if (armazenamentoOk && (!uidAnterior || uidAnterior !== u.id) && !/type=recovery/.test(location.hash)) { location.reload(); return null; }
+        if (armazenamentoOk && (!uidAnterior || uidAnterior !== u.id)) { location.reload(); return null; }
         return usuario;
       }
     } catch (e) { /* cai para o modo offline abaixo */ }
@@ -70,6 +72,7 @@ const Auth = (() => {
         // Saiu em outra aba (ou a sessão expirou de vez): volta para o login.
         if (usuario && !usuario.offline) { limparLocal(); location.reload(); }
       } else if (evento === 'SIGNED_IN' && sessao && sessao.user) {
+        if (window.__RECUPERACAO__) return;
         const uidAnterior = localStorage.getItem(UID_KEY);
         if (uidAnterior && uidAnterior !== sessao.user.id) {
           guardarUsuario(sessao.user);
@@ -253,7 +256,7 @@ const Auth = (() => {
 
   return {
     init, entrar, cadastrar, sair, recuperarSenha,
-    mostrarTela, esconderTela,
+    mostrarTela, esconderTela, mostrarMensagem,
     usuario: () => usuario,
     id: () => (usuario && usuario.id) || localStorage.getItem(UID_KEY),
     email: () => (usuario && usuario.email) || localStorage.getItem(EMAIL_KEY) || ''
