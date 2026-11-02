@@ -13,7 +13,8 @@
  */
 const Perfil = (() => {
   const sb = SupabaseApp.client;
-  const PADRAO = { nome_app: 'Minha Leitura', icone: 'emoji:📚', cor_primaria: '#6366f1', compartilhar_leitura: false, compartilhar_resumo: false };
+  const PADRAO = { nome_app: 'Minha Leitura', icone: 'emoji:📚', cor_primaria: '#6366f1', compartilhar_leitura: false, compartilhar_resumo: false,
+    aparecer_no_placar: false, compartilhar_desejos: false, compartilhar_biblioteca: false, compartilhar_citacoes: false };
   const EMOJIS = ['📚', '📖', '🦉', '🌙', '☕', '🌿', '🔥', '⭐', '🦋', '🐱', '🌊', '🎧', '🏔️', '🪐', '🍃', '✒️', '🕯️', '🍂', '🌸', '🧭'];
   const CORES = ['#6366f1', '#c81414', '#0f766e', '#b45309', '#7c3aed', '#0369a1', '#be185d', '#334155'];
 
@@ -43,7 +44,7 @@ const Perfil = (() => {
     if (emCache) { atual = normalizar(emCache); await aplicar(atual); }
 
     try {
-      const { data, error } = await sb.from('perfis').select('nome_app, icone, cor_primaria, compartilhar_leitura, compartilhar_resumo').maybeSingle();
+      const { data, error } = await sb.from('perfis').select('nome_app, icone, cor_primaria, compartilhar_leitura, compartilhar_resumo, aparecer_no_placar, compartilhar_desejos, compartilhar_biblioteca, compartilhar_citacoes').maybeSingle();
       if (error) throw error;
       if (data) {
         atual = normalizar(data);
@@ -69,7 +70,9 @@ const Perfil = (() => {
     if (!uid) throw new Error('Sessão expirada. Entre novamente.');
     const { error } = await sb.from('perfis').upsert(
       { user_id: uid, nome_app: novo.nome_app, icone: novo.icone, cor_primaria: novo.cor_primaria,
-        compartilhar_leitura: !!novo.compartilhar_leitura, compartilhar_resumo: !!novo.compartilhar_resumo },
+        compartilhar_leitura: !!novo.compartilhar_leitura, compartilhar_resumo: !!novo.compartilhar_resumo,
+        aparecer_no_placar: !!novo.aparecer_no_placar, compartilhar_desejos: !!novo.compartilhar_desejos,
+        compartilhar_biblioteca: !!novo.compartilhar_biblioteca, compartilhar_citacoes: !!novo.compartilhar_citacoes },
       { onConflict: 'user_id' }
     );
     if (error) throw new Error(error.message);
@@ -166,7 +169,11 @@ const Perfil = (() => {
       icone: rascunho.icone,
       cor_primaria: rascunho.cor_primaria,
       compartilhar_leitura: el('perfil-comp-leitura').checked,
-      compartilhar_resumo: el('perfil-comp-resumo').checked
+      compartilhar_resumo: el('perfil-comp-resumo').checked,
+      aparecer_no_placar: el('perfil-comp-placar').checked,
+      compartilhar_desejos: el('perfil-comp-desejos').checked,
+      compartilhar_biblioteca: el('perfil-comp-biblioteca').checked,
+      compartilhar_citacoes: el('perfil-comp-citacoes').checked
     };
   }
 
@@ -202,6 +209,10 @@ const Perfil = (() => {
     el('perfil-nome').value = atual.nome_app;
     el('perfil-comp-leitura').checked = !!atual.compartilhar_leitura;
     el('perfil-comp-resumo').checked = !!atual.compartilhar_resumo;
+    el('perfil-comp-placar').checked = !!atual.aparecer_no_placar;
+    el('perfil-comp-desejos').checked = !!atual.compartilhar_desejos;
+    el('perfil-comp-biblioteca').checked = !!atual.compartilhar_biblioteca;
+    el('perfil-comp-citacoes').checked = !!atual.compartilhar_citacoes;
     el('perfil-email').textContent = Auth.email() || '—';
 
     if (!telaPronta) {

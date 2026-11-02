@@ -133,6 +133,7 @@
         <a href="#" class="nav-link" data-page="adicionar"><i class="fas fa-plus-circle me-2"></i> Adicionar</a>
         <a href="#" class="nav-link" data-page="metas"><i class="fas fa-bullseye me-2"></i> Metas</a>
         <a href="#" class="nav-link" data-page="bingo"><i class="fas fa-dice me-2"></i> Bingo Literário</a>
+        <a href="#" class="nav-link" data-page="circulo"><i class="fas fa-users me-2"></i> Círculo de leitura</a>
         <a href="#" class="nav-link" data-page="jornada"><i class="fas fa-compass me-2"></i> Jornada de leitura</a>
         <a href="#" class="nav-link" data-page="anotacoes"><i class="fas fa-sticky-note me-2"></i> Anotações</a>
         <a href="#" class="nav-link" data-page="exportar"><i class="fas fa-download me-2"></i> Exportar</a>
@@ -179,6 +180,7 @@
       <a href="#" class="nav-link sidebar-icon" data-page="estatisticas" title="Estatísticas"><i class="fas fa-chart-pie"></i></a>
       <a href="#" class="nav-link sidebar-icon" data-page="metas" title="Metas"><i class="fas fa-bullseye"></i></a>
       <a href="#" class="nav-link sidebar-icon" data-page="bingo" title="Bingo Literário"><i class="fas fa-dice"></i></a>
+      <a href="#" class="nav-link sidebar-icon" data-page="circulo" title="Círculo de leitura"><i class="fas fa-users"></i></a>
       <a href="#" class="nav-link sidebar-icon" data-page="jornada" title="Jornada de leitura"><i class="fas fa-compass"></i></a>
       <a href="#" class="nav-link sidebar-icon" data-page="anotacoes" title="Anotações"><i class="fas fa-sticky-note"></i></a>
       <a href="#" class="nav-link sidebar-icon" data-page="desejos" title="Desejos"><i class="fas fa-heart"></i></a>
@@ -324,7 +326,10 @@
         <!-- Círculo de leitura: o que cada pessoa do grupo escolheu compartilhar -->
         <div class="card mt-3 shadow-sm" id="circulo-card" hidden>
           <div class="card-body">
-            <h5 class="mb-3"><i class="fas fa-users me-2"></i>Círculo de leitura</h5>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0"><i class="fas fa-users me-2"></i>Círculo de leitura</h5>
+              <a href="#" class="small nav-link p-0" data-page="circulo">Abrir o círculo <i class="fas fa-chevron-right"></i></a>
+            </div>
             <div id="circulo-lista" class="circulo-lista"></div>
             <small class="text-muted d-block mt-2">Só aparece o que cada pessoa liberou em Configurações → Meu perfil.</small>
           </div>
@@ -1241,6 +1246,23 @@
       </div>
     </div>
 
+    <div id="page-circulo" class="page">
+      <div class="container py-4">
+        <h1 class="mb-1"><i class="fas fa-users me-2"></i>Círculo de leitura</h1>
+        <p class="text-muted mb-3 small">Só aparece aqui o que cada pessoa escolheu compartilhar em Configurações → Meu perfil.</p>
+        <div class="circulo-abas" id="circulo-abas" role="tablist">
+          <button type="button" class="circulo-aba-btn active" data-aba="atividade">Atividade</button>
+          <button type="button" class="circulo-aba-btn" data-aba="metas">Metas</button>
+          <button type="button" class="circulo-aba-btn" data-aba="juntos">Ler junto</button>
+          <button type="button" class="circulo-aba-btn" data-aba="trocas">Trocas</button>
+        </div>
+        <div id="cp-atividade" class="cp-aba"></div>
+        <div id="cp-metas" class="cp-aba" hidden></div>
+        <div id="cp-juntos" class="cp-aba" hidden></div>
+        <div id="cp-trocas" class="cp-aba" hidden></div>
+      </div>
+    </div>
+
     <div id="page-jornada" class="page">
       <div class="container py-4">
         <h1 class="mb-1"><i class="fas fa-compass me-2"></i>Jornada de leitura</h1>
@@ -1549,6 +1571,22 @@
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="perfil-comp-resumo">
                 <label class="form-check-label" for="perfil-comp-resumo">Mostrar ao círculo quantas páginas li no mês e quantos livros terminei no ano</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-placar">
+                <label class="form-check-label" for="perfil-comp-placar">Aparecer no placar mensal (páginas e dias lidos no mês)</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-desejos">
+                <label class="form-check-label" for="perfil-comp-desejos">Mostrar minha lista de desejos (só título e autor)</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-biblioteca">
+                <label class="form-check-label" for="perfil-comp-biblioteca">Deixar o círculo ver quais livros tenho (para pedir emprestado)</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-citacoes">
+                <label class="form-check-label" for="perfil-comp-citacoes">Mostrar minhas citações e as notas (1 a 5) dos livros que terminei</label>
               </div>
               <small class="text-muted">Tudo começa desligado. Sessões, anotações e e-mail nunca são mostrados.</small>
             </div>
@@ -2054,6 +2092,7 @@
   <script src="js/auth.js"></script>
   <script src="js/perfil.js"></script>
   <script src="js/circulo.js"></script>
+  <script src="js/circulo-pagina.js"></script>
 
   <!-- Módulos -->
   <script src="js/db.js"></script>

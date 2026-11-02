@@ -191,6 +191,9 @@ function activatePageGlobal(pageName) {
     case 'exportar':
       if (typeof Exportar !== 'undefined' && Exportar.init) Exportar.init();
       break;
+    case 'circulo':
+      if (typeof CirculoPagina !== 'undefined') CirculoPagina.init();
+      break;
     case 'configuracoes':
       if (typeof Perfil !== 'undefined') { try { Perfil.initTela(); } catch (e) { console.error(e); } }
       if (typeof Circulo !== 'undefined') Circulo.initConvites();
@@ -217,6 +220,7 @@ function activatePageGlobal(pageName) {
     metas: 'fa-bullseye',
     bingo: 'fa-dice',
     jornada: 'fa-compass',
+    circulo: 'fa-users',
     anotacoes: 'fa-sticky-note',
     desejos: 'fa-heart',
     exportar: 'fa-download',
