@@ -91,6 +91,7 @@ const Auth = (() => {
     if (m.includes('at least 6 characters') || m.includes('weak password')) return 'A senha precisa ter pelo menos 6 caracteres.';
     if (m.includes('rate limit') || m.includes('too many')) return 'Muitas tentativas. Aguarde um pouco e tente de novo.';
     if (m.includes('invalid email') || m.includes('unable to validate email')) return 'E-mail inválido.';
+    if (m.includes('database error saving new user') || m.includes('convite')) return 'Código de convite inválido, expirado ou já usado.';
     if (m.includes('failed to fetch') || m.includes('network')) return 'Sem conexão com a internet.';
     if (m.includes('same password') || m.includes('different from the old')) return 'A nova senha precisa ser diferente da anterior.';
     return 'Não foi possível concluir. Tente novamente.';
@@ -103,10 +104,16 @@ const Auth = (() => {
     location.reload();
   }
 
-  async function cadastrar(email, senha) {
+  async function cadastrar(email, senha, codigo) {
+    codigo = String(codigo || '').trim().toUpperCase();
+    if (!codigo) throw new Error('Informe o código de convite.');
+    // Confere o código antes, para avisar com clareza (o banco confere de novo e é quem manda).
+    const { data: valido, error: erroCodigo } = await sb.rpc('validar_convite', { p_codigo: codigo });
+    if (erroCodigo) throw new Error(traduzirErro(erroCodigo.message));
+    if (valido !== true) throw new Error('Código de convite inválido, expirado ou já usado.');
     const { data, error } = await sb.auth.signUp({
       email, password: senha,
-      options: { emailRedirectTo: location.origin + location.pathname }
+      options: { emailRedirectTo: location.origin + location.pathname, data: { codigo_convite: codigo } }
     });
     if (error) throw new Error(traduzirErro(error.message));
     if (data.session && data.user) {
@@ -166,7 +173,7 @@ const Auth = (() => {
   function atualizarModo() {
     const titulos = {
       entrar: ['Entrar', 'Acesse sua biblioteca e seu diário de leitura.'],
-      cadastrar: ['Criar conta', 'Cada pessoa tem seus próprios livros e estatísticas.'],
+      cadastrar: ['Criar conta', 'Você precisa de um código de convite. Cada pessoa tem seus próprios livros e estatísticas.'],
       recuperar: ['Recuperar senha', 'Enviaremos um link para você criar uma nova senha.'],
       'nova-senha': ['Nova senha', 'Escolha a nova senha da sua conta.']
     };
@@ -177,6 +184,12 @@ const Auth = (() => {
     el('auth-campo-email').hidden = modo === 'nova-senha';
     el('auth-campo-senha').hidden = modo === 'recuperar';
     el('auth-campo-senha2').hidden = !(modo === 'cadastrar' || modo === 'nova-senha');
+    el('auth-campo-codigo').hidden = modo !== 'cadastrar';
+    el('auth-codigo').required = modo === 'cadastrar';
+    if (modo === 'cadastrar' && !el('auth-codigo').value) {
+      const c = new URLSearchParams(location.search).get('convite');
+      if (c) el('auth-codigo').value = c.toUpperCase();
+    }
     el('auth-link-esqueci').hidden = modo !== 'entrar';
     el('auth-rodape-entrar').hidden = modo !== 'entrar';
     el('auth-rodape-cadastrar').hidden = modo === 'entrar';
@@ -229,7 +242,7 @@ const Auth = (() => {
         if (modo === 'entrar') {
           await entrar(email, senha);
         } else if (modo === 'cadastrar') {
-          const r = await cadastrar(email, senha);
+          const r = await cadastrar(email, senha, el('auth-codigo').value);
           if (r.confirmar) {
             modo = 'entrar';
             atualizarModo();

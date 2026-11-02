@@ -31,3 +31,10 @@ body.auth-aberta #auth-overlay{visibility:visible}
 .perfil-cores{display:flex;gap:6px;flex-wrap:wrap}
 .perfil-cor{width:32px;height:32px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
 .perfil-cor.ativo{border-color:#fff;box-shadow:0 0 0 2px #333}
+
+/* Círculo de leitura (Início) */
+.circulo-lista{display:flex;flex-direction:column;gap:12px}
+.circulo-item{display:flex;gap:12px;align-items:flex-start}
+.circulo-item img{flex:0 0 40px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.circulo-info{min-width:0}
+.circulo-livro{font-size:.92rem;overflow-wrap:anywhere}

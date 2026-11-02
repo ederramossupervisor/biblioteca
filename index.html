@@ -66,6 +66,10 @@
           <label for="auth-email">E-mail</label>
           <input id="auth-email" type="email" autocomplete="email" inputmode="email" class="form-control" required>
         </div>
+        <div id="auth-campo-codigo" class="auth-campo" hidden>
+          <label for="auth-codigo">Código de convite</label>
+          <input id="auth-codigo" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" class="form-control" placeholder="Ex.: K7M2QX9P">
+        </div>
         <div id="auth-campo-senha" class="auth-campo">
           <label for="auth-senha">Senha</label>
           <div class="auth-senha-wrap">
@@ -81,7 +85,7 @@
         <div id="auth-msg" class="auth-msg erro" role="alert" hidden></div>
         <button id="auth-enviar" type="submit" class="btn btn-primary w-100">Entrar</button>
       </form>
-      <p id="auth-rodape-entrar" class="auth-rodape">Ainda não tem conta? <a href="#" id="auth-ir-cadastrar">Criar conta</a></p>
+      <p id="auth-rodape-entrar" class="auth-rodape">Tem um convite? <a href="#" id="auth-ir-cadastrar">Criar conta</a></p>
       <p id="auth-rodape-cadastrar" class="auth-rodape" hidden>Já tem conta? <a href="#" id="auth-ir-entrar">Entrar</a></p>
     </div>
   </div>
@@ -314,6 +318,15 @@
               <div class="progress-bar" id="barra-meta" role="progressbar" style="width: 0%">0%</div>
             </div>
             <span id="meta-texto">0 de 0 livros (0%)</span>
+          </div>
+        </div>
+
+        <!-- Círculo de leitura: o que cada pessoa do grupo escolheu compartilhar -->
+        <div class="card mt-3 shadow-sm" id="circulo-card" hidden>
+          <div class="card-body">
+            <h5 class="mb-3"><i class="fas fa-users me-2"></i>Círculo de leitura</h5>
+            <div id="circulo-lista" class="circulo-lista"></div>
+            <small class="text-muted d-block mt-2">Só aparece o que cada pessoa liberou em Configurações → Meu perfil.</small>
           </div>
         </div>
 
@@ -1527,12 +1540,34 @@
                 <input type="color" id="perfil-cor-livre" class="form-control form-control-color" title="Outra cor">
               </div>
             </div>
+            <div class="mb-3">
+              <label class="form-label">Círculo de leitura</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-leitura">
+                <label class="form-check-label" for="perfil-comp-leitura">Mostrar ao círculo o livro que estou lendo e meu progresso nele</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="perfil-comp-resumo">
+                <label class="form-check-label" for="perfil-comp-resumo">Mostrar ao círculo quantas páginas li no mês e quantos livros terminei no ano</label>
+              </div>
+              <small class="text-muted">Tudo começa desligado. Sessões, anotações e e-mail nunca são mostrados.</small>
+            </div>
             <div class="d-flex gap-2 flex-wrap">
               <button type="submit" id="perfil-salvar" class="btn btn-primary"><i class="fas fa-save me-1"></i>Salvar perfil</button>
               <button type="button" id="btn-sair" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt me-1"></i>Sair da conta</button>
             </div>
             <small class="text-muted d-block mt-2">Para o nome e o ícone mudarem também na tela inicial do celular, remova o app e adicione de novo.</small>
           </form>
+        </div>
+      </div>
+
+      <!-- Convites (só administrador) -->
+      <div class="card mb-4 shadow-sm" id="card-convites" hidden>
+        <div class="card-header fw-bold"><i class="fas fa-ticket-alt me-2"></i>Convites</div>
+        <div class="card-body">
+          <p class="small text-muted mb-2">Cada código vale para um cadastro e expira em 7 dias. Envie o código (ou o link) para a pessoa.</p>
+          <button type="button" id="btn-novo-convite" class="btn btn-primary btn-sm mb-3"><i class="fas fa-plus me-1"></i>Gerar convite</button>
+          <div id="lista-convites" class="small"></div>
         </div>
       </div>
 
@@ -2018,6 +2053,7 @@
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/perfil.js"></script>
+  <script src="js/circulo.js"></script>
 
   <!-- Módulos -->
   <script src="js/db.js"></script>

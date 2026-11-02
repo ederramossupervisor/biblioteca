@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     try { await Perfil.carregar(); } catch (e) { /* ignora */ }
     document.body.classList.add('app-loaded');
     if (splash) splash.remove();
-    Auth.mostrarTela(emRecuperacao ? 'nova-senha' : 'entrar');
+    const temConvite = !!new URLSearchParams(location.search).get('convite');
+    Auth.mostrarTela(emRecuperacao ? 'nova-senha' : (temConvite ? 'cadastrar' : 'entrar'));
     if (window.__ERRO_LINK__ && !emRecuperacao) {
       Auth.mostrarMensagem('Este link expirou ou já foi usado. Peça um novo em "Esqueci minha senha".');
     }
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Nome, ícone, manifest do usuário (não bloqueia o carregamento dos dados)
   Perfil.initTela(); // liga os botões do card de perfil já no início
-  Perfil.carregar().then(() => Perfil.initTela()).catch(() => {});
+  Perfil.carregar().then(() => { Perfil.initTela(); Circulo.init(); }).catch(() => {});
 
   // Inicializa módulos básicos (independente da splash)
   initNavegacao();
@@ -192,6 +193,7 @@ function activatePageGlobal(pageName) {
       break;
     case 'configuracoes':
       if (typeof Perfil !== 'undefined') { try { Perfil.initTela(); } catch (e) { console.error(e); } }
+      if (typeof Circulo !== 'undefined') Circulo.initConvites();
       if (typeof Configuracoes !== 'undefined' && Configuracoes.init) Configuracoes.init();
       break;
   }

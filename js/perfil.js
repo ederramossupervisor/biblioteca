@@ -13,7 +13,7 @@
  */
 const Perfil = (() => {
   const sb = SupabaseApp.client;
-  const PADRAO = { nome_app: 'Minha Leitura', icone: 'emoji:📚', cor_primaria: '#6366f1' };
+  const PADRAO = { nome_app: 'Minha Leitura', icone: 'emoji:📚', cor_primaria: '#6366f1', compartilhar_leitura: false, compartilhar_resumo: false };
   const EMOJIS = ['📚', '📖', '🦉', '🌙', '☕', '🌿', '🔥', '⭐', '🦋', '🐱', '🌊', '🎧', '🏔️', '🪐', '🍃', '✒️', '🕯️', '🍂', '🌸', '🧭'];
   const CORES = ['#6366f1', '#c81414', '#0f766e', '#b45309', '#7c3aed', '#0369a1', '#be185d', '#334155'];
 
@@ -43,7 +43,7 @@ const Perfil = (() => {
     if (emCache) { atual = normalizar(emCache); await aplicar(atual); }
 
     try {
-      const { data, error } = await sb.from('perfis').select('nome_app, icone, cor_primaria').maybeSingle();
+      const { data, error } = await sb.from('perfis').select('nome_app, icone, cor_primaria, compartilhar_leitura, compartilhar_resumo').maybeSingle();
       if (error) throw error;
       if (data) {
         atual = normalizar(data);
@@ -68,7 +68,8 @@ const Perfil = (() => {
     const uid = sessao && sessao.session && sessao.session.user.id;
     if (!uid) throw new Error('Sessão expirada. Entre novamente.');
     const { error } = await sb.from('perfis').upsert(
-      { user_id: uid, nome_app: novo.nome_app, icone: novo.icone, cor_primaria: novo.cor_primaria },
+      { user_id: uid, nome_app: novo.nome_app, icone: novo.icone, cor_primaria: novo.cor_primaria,
+        compartilhar_leitura: !!novo.compartilhar_leitura, compartilhar_resumo: !!novo.compartilhar_resumo },
       { onConflict: 'user_id' }
     );
     if (error) throw new Error(error.message);
@@ -163,7 +164,9 @@ const Perfil = (() => {
     return {
       nome_app: (el('perfil-nome').value || '').trim(),
       icone: rascunho.icone,
-      cor_primaria: rascunho.cor_primaria
+      cor_primaria: rascunho.cor_primaria,
+      compartilhar_leitura: el('perfil-comp-leitura').checked,
+      compartilhar_resumo: el('perfil-comp-resumo').checked
     };
   }
 
@@ -197,6 +200,8 @@ const Perfil = (() => {
     if (!el('perfil-nome')) return;
     rascunho = { icone: atual.icone, cor_primaria: atual.cor_primaria };
     el('perfil-nome').value = atual.nome_app;
+    el('perfil-comp-leitura').checked = !!atual.compartilhar_leitura;
+    el('perfil-comp-resumo').checked = !!atual.compartilhar_resumo;
     el('perfil-email').textContent = Auth.email() || '—';
 
     if (!telaPronta) {
@@ -248,6 +253,7 @@ const Perfil = (() => {
         botao.disabled = true;
         try {
           await salvar(v);
+          if (typeof Circulo !== 'undefined') Circulo.carregarQuadro();
           Util.toast('Perfil atualizado! Para mudar o nome/ícone na tela inicial do celular, reinstale o app.', 'success');
         } catch (e) {
           Util.toast(e.message || 'Erro ao salvar o perfil.', 'danger');
