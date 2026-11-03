@@ -365,6 +365,16 @@ const MapaLeitura = (() => {
       }
     });
 
+    // Mantém o mapa sincronizado com o tamanho real da área (a página pode terminar de montar depois de criado).
+    // Sem isso, o fundo do mapa fica esticado e os marcadores saem do lugar quando há pouco zoom.
+    const caixa = document.getElementById('mapa-locais');
+    if (window.ResizeObserver) {
+      let t = null;
+      new ResizeObserver(() => { clearTimeout(t); t = setTimeout(() => { if (mapa) mapa.resize(); }, 50); }).observe(caixa);
+    }
+    mapa.on('load', () => mapa.resize());
+    setTimeout(() => { if (mapa) mapa.resize(); }, 600);
+
     // Os grupos só mudam com o zoom (a distância é em pixels); assim o balão aberto não fecha ao arrastar o mapa.
     mapa.on('zoomend', desenharMarcadores);
     mapa.on('click', (ev) => { if (posicionando) colocarPino([ev.lngLat.lng, ev.lngLat.lat]); });
