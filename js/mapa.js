@@ -1,7 +1,6 @@
 /**
- * Mapa de locais de leitura (MapLibre GL).
- *  - Marcadores com a capa do último livro (ou a inicial do local); o tamanho cresce com o uso.
- *  - Pontos muito próximos viram uma bolinha com a quantidade e se abrem ao dar zoom.
+ * Mapa de locais de leitura (Leaflet + OpenStreetMap).
+ *  - Marcadores com a capa do último livro (ou a inicial do local).
  *  - Locais sem posição aparecem numa lista, com "Marcar no mapa": tocar no mapa, buscar um
  *    endereço ou usar a localização atual. O pino pode ser arrastado antes de salvar.
  *  - Filtros por período e por livro; ranking dos locais ao lado.
@@ -9,30 +8,18 @@
  */
 const MapaLeitura = (() => {
   const CENTRO_BRASIL = [-47.8822, -15.7934]; // [lng, lat]
-  const ESTILO_CLARO = 'https://tiles.openfreemap.org/styles/liberty';
   const ATRIB_OSM = '&copy; OpenStreetMap contributors';
 
-  // Estilos "raster" simples: usados no modo escuro (CARTO Dark Matter) e como reserva se o
-  // estilo claro não carregar.
-  const ESTILO_ESCURO = 'https://tiles.openfreemap.org/styles/positron'; // claro e neutro; o CSS escurece o fundo no tema escuro
-  const ESTILO_RESERVA = {
-    version: 8,
-    sources: { base: { type: 'raster', tileSize: 256, maxzoom: 19, attribution: ATRIB_OSM,
-      tiles: ['a', 'b', 'c'].map((s) => `https://${s}.tile.openstreetmap.org/{z}/{x}/{y}.png`) } },
-    layers: [{ id: 'base', type: 'raster', source: 'base' }]
-  };
-
   const CORES_AVATAR = ['#5C6B5A', '#7A8B5E', '#8B4A3D', '#B79C6B', '#46543F'];
-  const DISTANCIA_AGRUPAR_PX = 46;
 
   let mapa = null;
   let dados = { sessoes: [], livros: [] };
   let configs = {};
   let locais = [];          // agregados com o filtro atual
   let marcadoresDOM = [];   // { marker, locais: [...] }
+  const ll = (c) => [c[1], c[0]]; // [lng,lat] -> [lat,lng] (Leaflet)
   let posicionando = null;  // { nome, marker, coord:[lng,lat] }
   let ligado = false;
-  let estiloReservaUsado = false;
 
   // ---------- utilitários ----------
   const el = (id) => document.getElementById(id);
@@ -116,11 +103,6 @@ const MapaLeitura = (() => {
   }
 
   // ---------- marcadores ----------
-  function tamanhoPara(l) {
-    const max = Math.max(...locais.map((x) => x.sessoes), 1);
-    return Math.round(30 + 26 * Math.sqrt(l.sessoes / max));
-  }
-
   function popupHtml(l) {
     return `<div style="text-align:center;min-width:150px;">
       ${l.capa ? `<img src="${esc(l.capa)}" alt="Capa" loading="lazy" style="width:50px;height:70px;object-fit:cover;border-radius:4px;margin-bottom:5px;">` : ''}
@@ -132,81 +114,34 @@ const MapaLeitura = (() => {
       ${l.ultimoLivro ? `<br><small><i class="fas fa-bookmark"></i> Último: ${esc(l.ultimoLivro)}</small>` : ''}</div>`;
   }
 
-  function elementoLocal(l) {
-    const t = tamanhoPara(l);
-    const d = document.createElement('div');
+  function iconeLocal(l) {
     if (l.capa) {
-      d.className = 'mapa-marcador';
-      d.style.width = Math.round(t * 0.78) + 'px';
-      d.style.height = t + 'px';
-      d.style.backgroundImage = `url("${String(l.capa).replace(/"/g, '%22')}")`;
-    } else {
-      d.className = 'mapa-avatar';
-      d.style.width = d.style.height = t + 'px';
-      d.style.fontSize = Math.round(t * 0.45) + 'px';
-      d.style.background = corAvatar(l.nome);
-      d.textContent = (l.nome || '?').trim().charAt(0).toUpperCase();
+      return L.icon({ iconUrl: l.capa, iconSize: [26, 34], iconAnchor: [13, 34], popupAnchor: [0, -34], className: 'icone-capa-marcador' });
     }
-    d.title = l.nome;
-    return d;
-  }
-
-  // Junta, de forma simples, os pontos que estão a menos de DISTANCIA_AGRUPAR_PX uns dos outros.
-  function agrupar(comCoord) {
-    const pontos = comCoord.map((l) => ({ l, p: mapa.project(l.coord) }));
-    const usados = new Set();
-    const grupos = [];
-    pontos.forEach((a, i) => {
-      if (usados.has(i)) return;
-      const grupo = [a.l];
-      usados.add(i);
-      pontos.forEach((b, j) => {
-        if (usados.has(j)) return;
-        if (Math.hypot(a.p.x - b.p.x, a.p.y - b.p.y) < DISTANCIA_AGRUPAR_PX) { grupo.push(b.l); usados.add(j); }
-      });
-      grupos.push(grupo);
+    const inicial = (l.nome || '?').trim().charAt(0).toUpperCase();
+    return L.divIcon({
+      className: 'avatar-marcador-local',
+      html: `<div style="background:${corAvatar(l.nome)};">${esc(inicial)}</div>`,
+      iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -15]
     });
-    return grupos;
   }
 
   function desenharMarcadores() {
     if (!mapa) return;
-    marcadoresDOM.forEach((m) => m.marker.remove());
+    marcadoresDOM.forEach((m) => mapa.removeLayer(m.marker));
     marcadoresDOM = [];
-
-    const comCoord = locais.filter((l) => l.coord);
-    agrupar(comCoord).forEach((grupo) => {
-      if (grupo.length === 1) {
-        const l = grupo[0];
-        const popup = new maplibregl.Popup({ offset: 24, maxWidth: '260px' }).setHTML(popupHtml(l));
-        const marker = new maplibregl.Marker({ element: elementoLocal(l) }).setLngLat(l.coord).setPopup(popup).addTo(mapa);
-        marcadoresDOM.push({ marker, locais: [l] });
-      } else {
-        const lng = grupo.reduce((s, l) => s + l.coord[0], 0) / grupo.length;
-        const lat = grupo.reduce((s, l) => s + l.coord[1], 0) / grupo.length;
-        const d = document.createElement('div');
-        d.className = 'mapa-cluster';
-        d.style.width = d.style.height = '44px';
-        d.textContent = grupo.length;
-        d.title = grupo.map((l) => l.nome).join(', ');
-        d.addEventListener('click', () => {
-          const b = new maplibregl.LngLatBounds();
-          grupo.forEach((l) => b.extend(l.coord));
-          mapa.fitBounds(b, { padding: 80, maxZoom: 17, duration: 600 });
-        });
-        const marker = new maplibregl.Marker({ element: d }).setLngLat([lng, lat]).addTo(mapa);
-        marcadoresDOM.push({ marker, locais: grupo });
-      }
+    locais.filter((l) => l.coord).forEach((l) => {
+      const marker = L.marker(ll(l.coord), { icon: iconeLocal(l), title: l.nome }).addTo(mapa);
+      marker.bindPopup(popupHtml(l));
+      marcadoresDOM.push({ marker, locais: [l] });
     });
   }
 
   function enquadrar() {
     const pts = locais.filter((l) => l.coord);
-    if (!pts.length) { mapa.jumpTo({ center: CENTRO_BRASIL, zoom: 3.5 }); return; }
-    if (pts.length === 1) { mapa.jumpTo({ center: pts[0].coord, zoom: 13 }); return; }
-    const b = new maplibregl.LngLatBounds();
-    pts.forEach((l) => b.extend(l.coord));
-    mapa.fitBounds(b, { padding: 60, maxZoom: 15, duration: 0 });
+    if (!pts.length) { mapa.setView(ll(CENTRO_BRASIL), 4); return; }
+    if (pts.length === 1) { mapa.setView(ll(pts[0].coord), 13); return; }
+    mapa.fitBounds(L.latLngBounds(pts.map((l) => ll(l.coord))).pad(0.1));
   }
 
   // ---------- listas (ranking e locais sem posição) ----------
@@ -256,8 +191,8 @@ const MapaLeitura = (() => {
     el('mapa-resultados-busca').innerHTML = '';
     el('mapa-busca').value = '';
     el('mapa-btn-salvar-pos').disabled = true;
-    mapa.getCanvas().style.cursor = 'crosshair';
-    if (coordAtual) { colocarPino(coordAtual); mapa.flyTo({ center: coordAtual, zoom: Math.max(mapa.getZoom(), 14) }); }
+    mapa.getContainer().style.cursor = 'crosshair';
+    if (coordAtual) { colocarPino(coordAtual); mapa.flyTo(ll(coordAtual), Math.max(mapa.getZoom(), 14)); }
     el('mapa-modo').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -265,23 +200,24 @@ const MapaLeitura = (() => {
     if (!posicionando) return;
     posicionando.coord = coord;
     if (!posicionando.marker) {
-      posicionando.marker = new maplibregl.Marker({ draggable: true, color: '#d6336c' }).setLngLat(coord).addTo(mapa);
+      const pino = L.divIcon({ className: 'mapa-pino', html: '<i class="fas fa-map-marker-alt"></i>', iconSize: [30, 40], iconAnchor: [15, 38] });
+      posicionando.marker = L.marker(ll(coord), { icon: pino, draggable: true }).addTo(mapa);
       posicionando.marker.on('dragend', () => {
-        const p = posicionando.marker.getLngLat();
+        const p = posicionando.marker.getLatLng();
         posicionando.coord = [p.lng, p.lat];
       });
     } else {
-      posicionando.marker.setLngLat(coord);
+      posicionando.marker.setLatLng(ll(coord));
     }
     el('mapa-btn-salvar-pos').disabled = false;
   }
 
   function cancelarPosicionamento() {
-    if (posicionando && posicionando.marker) posicionando.marker.remove();
+    if (posicionando && posicionando.marker && mapa) mapa.removeLayer(posicionando.marker);
     posicionando = null;
     const modo = el('mapa-modo');
     if (modo) modo.hidden = true;
-    if (mapa) mapa.getCanvas().style.cursor = '';
+    if (mapa) mapa.getContainer().style.cursor = '';
   }
 
   async function salvarPosicionamento() {
@@ -323,7 +259,7 @@ const MapaLeitura = (() => {
     navigator.geolocation.getCurrentPosition((pos) => {
       const c = [pos.coords.longitude, pos.coords.latitude];
       colocarPino(c);
-      mapa.flyTo({ center: c, zoom: 16 });
+      mapa.flyTo(ll(c), 16);
     }, () => Util.toast('Não consegui obter sua localização (verifique a permissão do navegador).', 'warning'), { enableHighAccuracy: true, timeout: 15000 });
   }
 
@@ -332,10 +268,10 @@ const MapaLeitura = (() => {
     if (!l || !l.coord) return;
     el('mapa-locais').scrollIntoView({ behavior: 'smooth', block: 'center' });
     mapa.once('moveend', () => {
-      const m = marcadoresDOM.find((x) => x.locais.length === 1 && x.locais[0].nome === nome);
-      if (m && !m.marker.getPopup().isOpen()) m.marker.togglePopup();
+      const m = marcadoresDOM.find((x) => x.locais[0].nome === nome);
+      if (m) m.marker.openPopup();
     });
-    mapa.flyTo({ center: l.coord, zoom: Math.max(mapa.getZoom(), 15) });
+    mapa.flyTo(ll(l.coord), Math.max(mapa.getZoom(), 15));
   }
 
   // ---------- inicialização ----------
@@ -346,39 +282,18 @@ const MapaLeitura = (() => {
 
   function criarMapa() {
     aplicarTemaMapa();
-    mapa = new maplibregl.Map({
-      container: 'mapa-locais',
-      style: escuro() ? ESTILO_ESCURO : ESTILO_CLARO,
-      center: CENTRO_BRASIL,
-      zoom: 3.5,
-      attributionControl: { compact: true }
-    });
-    mapa.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
-    mapa.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+    mapa = L.map('mapa-locais').setView(ll(CENTRO_BRASIL), 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: ATRIB_OSM, maxZoom: 19 }).addTo(mapa);
 
-    // Se o estilo moderno não carregar (serviço fora do ar, rede ruim), cai para o mapa simples.
-    mapa.on('error', (ev) => {
-      if (estiloReservaUsado) return;
-      const msg = String((ev && ev.error && ev.error.message) || '');
-      if (!mapa.isStyleLoaded() && /style|fetch|Failed|Not Found|NetworkError/i.test(msg)) {
-        estiloReservaUsado = true;
-        mapa.setStyle(ESTILO_RESERVA);
-      }
-    });
-
-    // Mantém o mapa sincronizado com o tamanho real da área (a página pode terminar de montar depois de criado).
-    // Sem isso, o fundo do mapa fica esticado e os marcadores saem do lugar quando há pouco zoom.
+    // Mantém o mapa do tamanho certo da área (evita marcadores fora do lugar se a área mudar depois).
     const caixa = document.getElementById('mapa-locais');
     if (window.ResizeObserver) {
       let t = null;
-      new ResizeObserver(() => { clearTimeout(t); t = setTimeout(() => { if (mapa) mapa.resize(); }, 50); }).observe(caixa);
+      new ResizeObserver(() => { clearTimeout(t); t = setTimeout(() => { if (mapa) mapa.invalidateSize(); }, 50); }).observe(caixa);
     }
-    mapa.on('load', () => mapa.resize());
-    setTimeout(() => { if (mapa) mapa.resize(); }, 600);
+    setTimeout(() => { if (mapa) mapa.invalidateSize(); }, 600);
 
-    // Os grupos só mudam com o zoom (a distância é em pixels); assim o balão aberto não fecha ao arrastar o mapa.
-    mapa.on('zoomend', desenharMarcadores);
-    mapa.on('click', (ev) => { if (posicionando) colocarPino([ev.lngLat.lng, ev.lngLat.lat]); });
+    mapa.on('click', (ev) => { if (posicionando) colocarPino([ev.latlng.lng, ev.latlng.lat]); });
   }
 
   function ligarEventos() {
@@ -397,7 +312,7 @@ const MapaLeitura = (() => {
       const r = el('mapa-resultados-busca')._resultados[Number(b.dataset.res)];
       const c = [Number(r.lon), Number(r.lat)];
       colocarPino(c);
-      mapa.flyTo({ center: c, zoom: 16 });
+      mapa.flyTo(ll(c), 16);
       el('mapa-resultados-busca').innerHTML = '';
     });
 
@@ -411,18 +326,17 @@ const MapaLeitura = (() => {
 
     window.addEventListener('calixteca:tema-alterado', () => {
       aplicarTemaMapa();
-      if (mapa) mapa.setStyle(escuro() ? ESTILO_ESCURO : ESTILO_CLARO);
     });
     // Coordenada nova salva em Configurações (ou aqui): descarta o cache local e recarrega.
     window.addEventListener('calixteca:configs-atualizadas', () => carregar(true, false));
   }
 
   async function init() {
-    if (!el('mapa-locais') || typeof maplibregl === 'undefined') return;
+    if (!el('mapa-locais') || typeof L === 'undefined') return;
     if (!mapa) {
       criarMapa();
     } else {
-      mapa.resize();
+      mapa.invalidateSize();
     }
     if (!ligado) { ligado = true; ligarEventos(); }
     await carregar(false);

@@ -51,7 +51,7 @@
   <link rel="stylesheet" href="css/dark-mode.css">
   <link rel="stylesheet" href="css/login.css">
   <link rel="preload" as="image" href="img/fundo-splash.png">
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body class="light-mode">
   <!-- Tela de login / cadastro -->
@@ -1142,7 +1142,7 @@
           </div>
         </div>
         <div class="card-body p-0">
-          <div id="mapa-locais" style="height: 75vh; min-height: 450px; max-height: 900px;"></div>
+          <div id="mapa-locais" style="height: clamp(520px, 78vh, 900px);"></div>
         </div>
         <div class="card-body">
           <div id="mapa-pendentes" class="mb-3" hidden></div>
@@ -2144,7 +2144,7 @@
   <script src="js/estatisticas.js"></script>
   <script src="js/retrospectiva.js"></script>
   <script src="js/calendario.js"></script>
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/mapa.js"></script> 
   <script src="js/metas.js"></script>
   <script src="js/bingo.js"></script>
