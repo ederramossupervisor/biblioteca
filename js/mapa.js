@@ -14,12 +14,7 @@ const MapaLeitura = (() => {
 
   // Estilos "raster" simples: usados no modo escuro (CARTO Dark Matter) e como reserva se o
   // estilo claro não carregar.
-  const ESTILO_ESCURO = {
-    version: 8,
-    sources: { base: { type: 'raster', tileSize: 256, maxzoom: 19, attribution: ATRIB_OSM + ' &copy; CARTO',
-      tiles: ['a', 'b', 'c', 'd'].map((s) => `https://${s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png`) } },
-    layers: [{ id: 'base', type: 'raster', source: 'base' }]
-  };
+  const ESTILO_ESCURO = 'https://tiles.openfreemap.org/styles/positron'; // claro e neutro; o CSS escurece o fundo no tema escuro
   const ESTILO_RESERVA = {
     version: 8,
     sources: { base: { type: 'raster', tileSize: 256, maxzoom: 19, attribution: ATRIB_OSM,
@@ -344,7 +339,13 @@ const MapaLeitura = (() => {
   }
 
   // ---------- inicialização ----------
+  function aplicarTemaMapa() {
+    const c = document.getElementById('mapa-locais');
+    if (c) c.classList.toggle('mapa-escuro', escuro());
+  }
+
   function criarMapa() {
+    aplicarTemaMapa();
     mapa = new maplibregl.Map({
       container: 'mapa-locais',
       style: escuro() ? ESTILO_ESCURO : ESTILO_CLARO,
@@ -357,7 +358,7 @@ const MapaLeitura = (() => {
 
     // Se o estilo moderno não carregar (serviço fora do ar, rede ruim), cai para o mapa simples.
     mapa.on('error', (ev) => {
-      if (estiloReservaUsado || escuro()) return;
+      if (estiloReservaUsado) return;
       const msg = String((ev && ev.error && ev.error.message) || '');
       if (!mapa.isStyleLoaded() && /style|fetch|Failed|Not Found|NetworkError/i.test(msg)) {
         estiloReservaUsado = true;
@@ -409,6 +410,7 @@ const MapaLeitura = (() => {
     });
 
     window.addEventListener('calixteca:tema-alterado', () => {
+      aplicarTemaMapa();
       if (mapa) mapa.setStyle(escuro() ? ESTILO_ESCURO : ESTILO_CLARO);
     });
     // Coordenada nova salva em Configurações (ou aqui): descarta o cache local e recarrega.
