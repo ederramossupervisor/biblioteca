@@ -51,7 +51,7 @@
   <link rel="stylesheet" href="css/dark-mode.css">
   <link rel="stylesheet" href="css/login.css">
   <link rel="preload" as="image" href="img/fundo-splash.png">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
 </head>
 <body class="light-mode">
   <!-- Tela de login / cadastro -->
@@ -1109,8 +1109,45 @@
             <i class="fas fa-sync-alt"></i>
           </button>
         </div>
+        <div class="card-body pb-2">
+          <div class="row g-2">
+            <div class="col-6 col-md-3">
+              <select id="mapa-filtro-periodo" class="form-select form-select-sm" aria-label="Período">
+                <option value="todos">Todo o período</option>
+                <option value="ano">Este ano</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="30">Últimos 30 dias</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-5">
+              <select id="mapa-filtro-livro" class="form-select form-select-sm" aria-label="Livro">
+                <option value="">Todos os livros</option>
+              </select>
+            </div>
+          </div>
+          <!-- Aparece ao marcar/reposicionar um local -->
+          <div id="mapa-modo" class="mapa-modo" hidden>
+            <div class="fw-bold mb-1" id="mapa-modo-titulo"></div>
+            <div class="small text-muted mb-2">Toque no mapa, busque um endereço ou use sua localização. Você pode arrastar o pino para ajustar.</div>
+            <div class="d-flex gap-1 mb-2">
+              <input type="text" id="mapa-busca" class="form-control form-control-sm" placeholder="Buscar endereço ou lugar…" maxlength="120">
+              <button type="button" id="mapa-btn-buscar" class="btn btn-outline-secondary btn-sm text-nowrap">Buscar</button>
+              <button type="button" id="mapa-btn-gps" class="btn btn-outline-secondary btn-sm text-nowrap" title="Usar minha localização"><i class="fas fa-location-crosshairs"></i></button>
+            </div>
+            <div id="mapa-resultados-busca" class="mb-2"></div>
+            <div class="d-flex gap-2">
+              <button type="button" id="mapa-btn-salvar-pos" class="btn btn-primary btn-sm" disabled>Salvar posição</button>
+              <button type="button" id="mapa-btn-cancelar-pos" class="btn btn-outline-secondary btn-sm">Cancelar</button>
+            </div>
+          </div>
+        </div>
         <div class="card-body p-0">
           <div id="mapa-locais" style="height: 450px;"></div>
+        </div>
+        <div class="card-body">
+          <div id="mapa-pendentes" class="mb-3" hidden></div>
+          <h6 class="fw-bold mb-2">Seus locais</h6>
+          <div id="mapa-ranking"></div>
         </div>
       </div>
     </div>
@@ -2107,7 +2144,7 @@
   <script src="js/estatisticas.js"></script>
   <script src="js/retrospectiva.js"></script>
   <script src="js/calendario.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script src="js/mapa.js"></script> 
   <script src="js/metas.js"></script>
   <script src="js/bingo.js"></script>

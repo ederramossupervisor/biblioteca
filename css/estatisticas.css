@@ -96,31 +96,67 @@
   color: var(--primary);
 }
 
-.icone-capa-marcador {
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+/* ===== MAPA DE LOCAIS (MapLibre) ===== */
+.mapa-marcador {
+  border-radius: 8px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
 }
-
-.avatar-marcador-local div {
-  width: 30px;
-  height: 30px;
+.mapa-avatar {
   border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-weight: 700;
-  font-size: 13px;
   font-family: var(--font-family);
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
 }
-
-.leaflet-popup-content i {
+.mapa-cluster {
+  border-radius: 50%;
+  background: var(--primary, #5C6B5A);
+  color: #fff;
+  border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+.maplibregl-popup-content { color: #222; }
+.maplibregl-popup-content i {
   color: var(--primary);
   width: 1.1em;
   text-align: center;
 }
+.mapa-modo {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed rgba(127,127,127,.5);
+  border-radius: 8px;
+}
+.mapa-modo[hidden], #mapa-pendentes[hidden] { display: none; }
+.mapa-rank-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(127,127,127,.15);
+}
+.mapa-rank-item:last-child { border-bottom: 0; }
+.mapa-rank-item .mapa-rank-nome { flex: 1; min-width: 0; cursor: pointer; }
+.mapa-rank-pos { width: 1.6em; text-align: center; font-weight: 700; color: var(--primary); }
+.mapa-pendente {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 8px; margin-bottom: 4px; border-radius: 8px; background: rgba(255,193,7,.15);
+}
+.mapa-resultado-busca { display:block; width:100%; text-align:left; border:0; background:none; padding:4px 2px; font-size:.85rem; color:inherit; border-bottom:1px solid rgba(127,127,127,.15); }
 
 /* ===== TABELAS DOS INSIGHTS AVANÇADOS ===== */
 #tabela-clima thead,

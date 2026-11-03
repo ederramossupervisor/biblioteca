@@ -1,6 +1,6 @@
 // Calixteca – Service Worker v19 (shell completo + cache sob demanda para libs pesadas + cache de imagens/capas)
-const CACHE_NAME = 'leituras-v8';
-const RUNTIME_CACHE_NAME = 'leituras-runtime-v8';
+const CACHE_NAME = 'leituras-v9';
+const RUNTIME_CACHE_NAME = 'leituras-runtime-v9';
 
 // App shell: tudo que o app precisa pra funcionar offline logo de cara.
 // Instalado eagerly (cache.addAll) — por isso fica restrito a recursos
@@ -65,9 +65,7 @@ const ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
-  'https://unpkg.com/dexie@3.2.4/dist/dexie.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  'https://unpkg.com/dexie@3.2.4/dist/dexie.js'
 ];
 
 // Libs pesadas e usadas só por funções específicas (OCR, leitor de EPUB,
@@ -77,6 +75,7 @@ const ASSETS = [
 // estiver indisponível no momento da instalação.
 const RUNTIME_PATTERNS = [
   '@supabase/supabase-js',
+  'maplibre-gl',
   'tesseract.js',
   'quagga2',
   'html2canvas',

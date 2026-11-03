@@ -892,18 +892,28 @@ const Leitura = (() => {
   // coordenadas salvas, para facilitar reaproveitar um local já cadastrado.
   async function carregarLocaisConhecidos() {
     try {
-      const configs = await API.enviar({ acao: 'getConfigs' });
       const datalist = document.getElementById('locais-conhecidos-datalist');
-      if (!datalist || !configs) return;
+      if (!datalist) return;
+      const nomes = new Map(); // minúsculas -> nome como já foi escrito
+      const add = (nome) => { const n = String(nome || '').trim(); if (n && !nomes.has(n.toLowerCase())) nomes.set(n.toLowerCase(), n); };
+
+      const configs = await API.enviar({ acao: 'getConfigs' }).catch(() => null);
+      if (configs) {
+        Object.keys(configs).filter(c => c.startsWith('local_coord_')).forEach(c => add(c.replace('local_coord_', '').replace(/_/g, ' ')));
+      }
+      // Também os locais já usados em sessões (mesmo sem coordenada), do mais frequente ao menos.
+      const dados = await API.enviar({ acao: 'sessoesDosLocais' }).catch(() => null);
+      if (dados && Array.isArray(dados.sessoes)) {
+        const contagem = {};
+        dados.sessoes.forEach(s => { contagem[s.local] = (contagem[s.local] || 0) + 1; });
+        Object.keys(contagem).sort((a, b) => contagem[b] - contagem[a]).forEach(add);
+      }
       datalist.innerHTML = '';
-      Object.keys(configs)
-        .filter(chave => chave.startsWith('local_coord_'))
-        .forEach(chave => {
-          const nome = chave.replace('local_coord_', '').replace(/_/g, ' ');
-          const option = document.createElement('option');
-          option.value = nome;
-          datalist.appendChild(option);
-        });
+      nomes.forEach((nome) => {
+        const option = document.createElement('option');
+        option.value = nome;
+        datalist.appendChild(option);
+      });
     } catch (e) {
       console.error('Erro ao carregar locais conhecidos:', e);
     }

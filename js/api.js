@@ -14,7 +14,7 @@ const API = (() => {
   }
 
   const ACOES_CACHEAVEIS = new Set([
-    'getConfigs', 'listAllBooks', 'listBooks', 'listarLocais', 'listNotes',
+    'getConfigs', 'listAllBooks', 'listBooks', 'listarLocais', 'sessoesDosLocais', 'listNotes',
     'listQuotes', 'listWishes', 'listLoans', 'dashboard', 'timelineAtividades', 'buscarPalavra',
     'bingoEstado'
   ]);
@@ -1291,6 +1291,17 @@ const API = (() => {
     return resultado;
   }
 
+  // Sessões que têm local informado (para o mapa filtrar por período/livro no próprio navegador).
+  async function sessoesDosLocais() {
+    const livrosData = await todos('livros', 'id,titulo,url_capa');
+    const livros = livrosData.map((l) => ({ id: l.id, titulo: l.titulo || '', capa: l.url_capa || '' }));
+    const data = await todos('sessoes', 'local,paginas_lidas,tempo,data,livro_id');
+    const sessoes = data
+      .filter((s) => (s.local || '').trim())
+      .map((s) => ({ local: s.local.trim(), paginas: Number(s.paginas_lidas) || 0, minutos: Number(s.tempo) || 0, data: s.data || '', livroId: s.livro_id || null }));
+    return { sessoes, livros };
+  }
+
   // ========== ANOTAÇÕES / CITAÇÕES ==========
   async function adicionarAnotacao(a) {
     const row = { livro_id: a.livroID || null, capitulo: a.capitulo || '', pagina: a.pagina || '', categoria: a.categoria || 'Geral', resumo: a.resumo || '', trecho: a.trecho || '', comentario: a.comentario || '', imagem: a.imagem || '' };
@@ -1549,6 +1560,7 @@ const API = (() => {
       case 'resumoAno': return obterResumoAno(dados.ano);
       case 'proxyImage': return proxyImagem(dados.url);
       case 'listarLocais': return listarLocais();
+      case 'sessoesDosLocais': return sessoesDosLocais();
       case 'salvarCoordenadaLocal': return salvarCoordenadaLocal(dados.local, dados.coordenada);
       case 'deleteSession': return excluirSessao(dados.id);
       case 'heatmapRecente': return obterHeatmapRecente(dados.dias);
