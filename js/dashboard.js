@@ -263,9 +263,11 @@ const Dashboard = (() => {
     const agoraLocal = new Date();
     const hojeIso = `${agoraLocal.getFullYear()}-${String(agoraLocal.getMonth() + 1).padStart(2, '0')}-${String(agoraLocal.getDate()).padStart(2, '0')}`;
 
+    let totalPaginasMes = 0;
     for (let dia = 1; dia <= totalDias; dia++) {
       const iso = `${anoHeatmap}-${String(mesHeatmapSelecionado).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
       const paginas = heatmapMapaPaginasAtual[iso] || 0;
+      totalPaginasMes += paginas;
       const intensidade = paginas / heatmapMaxPagAtual;
 
       const celula = document.createElement('div');
@@ -290,6 +292,16 @@ const Dashboard = (() => {
     }
 
     grid.appendChild(corpo);
+
+    // Badge discreto: total de páginas lidas no mês selecionado
+    const badge = document.createElement('div');
+    badge.className = 'heatmap-mes-total';
+    badge.title = `Total de páginas lidas em ${MESES_ABREV[mesHeatmapSelecionado - 1]}/${anoHeatmap}`;
+    badge.innerHTML = '<i class="fas fa-book-open"></i>';
+    const textoBadge = document.createElement('span');
+    textoBadge.textContent = `${totalPaginasMes.toLocaleString('pt-BR')} página${totalPaginasMes === 1 ? '' : 's'} em ${MESES_ABREV[mesHeatmapSelecionado - 1]}`;
+    badge.appendChild(textoBadge);
+    grid.appendChild(badge);
   }
 
   function getHeatColorDashboard(intensidade) {
