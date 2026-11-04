@@ -230,6 +230,27 @@
   line-height: 1;
 }
 
+/* Badge discreto com o total de páginas lidas no mês selecionado */
+.heatmap-mes-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: fit-content;
+  margin: 10px auto 0;
+  padding: 2px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+.heatmap-mes-total i {
+  font-size: 0.65rem;
+  opacity: 0.75;
+}
+
 /* Timeline de atividades (js/timeline.js): feed vertical com marcadores por
    tipo de evento (livro adicionado/começou/finalizado/abandonado, anotação,
    conquista) e scroll infinito. */
