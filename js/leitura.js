@@ -30,6 +30,8 @@ const Leitura = (() => {
   const resultadoBuscaPalavra = document.getElementById('resultado-busca-palavra');
 
   let livrosCache = [];
+  let promessaLivros = null; // carregamento de livros em andamento (o histórico espera por ele)
+  let modoAtual = 'paginas'; // 'paginas' (Físico/PDF) ou 'percentual' (Kindle/Audiobook)
   let sessoesCache = [];
   let editandoSessaoID = null;
   let livroMap = {};
@@ -133,6 +135,95 @@ const Leitura = (() => {
     return lidas;
   }
 
+  // ===== Formato do livro: páginas x porcentagem =====
+  // Físico e PDF registram por página. Kindle e Audiobook registram por
+  // porcentagem (é o que esses apps mostram). No banco continua tudo em
+  // páginas: o % digitado vira uma "página equivalente" usando o total de
+  // páginas do livro, então metas, estatísticas e progresso seguem iguais.
+  // Para mudar o modo de um formato, é só mexer nesta lista.
+  const FORMATOS_PERCENTUAIS = ['kindle', 'audiobook'];
+  const TEXTOS_REGISTRO = {
+    paginas:    { titulo: 'Páginas',       inicial: 'Página inicial *', final: 'Página final *', lidas: 'Páginas lidas:' },
+    percentual: { titulo: 'Progresso (%)', inicial: 'Início (%) *',     final: 'Fim (%) *',      lidas: 'Lido:' }
+  };
+
+  function obterLivroSelecionado() {
+    const id = livroMap[livroInput.value.trim()];
+    return id ? (livrosCache.find(l => l.ID === id) || null) : null;
+  }
+
+  function emModoPercentual(livro) {
+    if (!livro) return false;
+    return FORMATOS_PERCENTUAIS.includes(String(livro.Formato || '').trim().toLowerCase());
+  }
+
+  function totalPaginasDoLivro(livro) {
+    const n = Number(livro && livro.NúmeroPáginas);
+    return n > 0 ? n : 0;
+  }
+
+  // Sem total de páginas não dá pra converter direito: cai em 1% = 1 página.
+  function percentualParaPagina(pct, total) {
+    const p = Math.min(100, Math.max(0, Number(pct) || 0));
+    return total > 0 ? Math.round(p * total / 100) : Math.round(p);
+  }
+
+  function paginaParaPercentual(pag, total) {
+    const n = Number(pag) || 0;
+    const p = total > 0 ? Math.round(n * 100 / total) : Math.round(n);
+    return Math.min(100, Math.max(0, p));
+  }
+
+  // Valores dos campos já em páginas (converte o % quando o livro é Kindle/Audiobook).
+  function paginasEquivalentesDoForm() {
+    const pi = parseInt(pagInicial.value, 10);
+    const pf = parseInt(pagFinal.value, 10);
+    if (modoAtual !== 'percentual') return { pi, pf };
+    const total = totalPaginasDoLivro(obterLivroSelecionado());
+    return { pi: percentualParaPagina(pi, total), pf: percentualParaPagina(pf, total) };
+  }
+
+  // Ajusta rótulos e limites dos campos conforme o formato do livro escolhido.
+  function aplicarModoRegistro(opcoes = {}) {
+    const livro = obterLivroSelecionado();
+    const novoModo = emModoPercentual(livro) ? 'percentual' : 'paginas';
+
+    // Trocou de modo com valores já digitados: limpa, pra não reinterpretar
+    // "30" (página) como "30%" (ou o contrário).
+    if (novoModo !== modoAtual && (pagInicial.value !== '' || pagFinal.value !== '')) {
+      pagInicial.value = '';
+      pagFinal.value = '';
+      pagLidasDiv.classList.add('d-none');
+    }
+    modoAtual = novoModo;
+
+    const t = TEXTOS_REGISTRO[novoModo];
+    const labelInicial = document.querySelector('label[for="pagina-inicial"]');
+    const labelFinal = document.querySelector('label[for="pagina-final"]');
+    const tituloCard = pagInicial.closest('.card')?.querySelector('.card-header');
+    const rotuloLidas = Array.from(pagLidasDiv.childNodes)
+      .find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim() !== '');
+    if (labelInicial) labelInicial.textContent = t.inicial;
+    if (labelFinal) labelFinal.textContent = t.final;
+    if (tituloCard) tituloCard.textContent = t.titulo;
+    if (rotuloLidas) rotuloLidas.textContent = ' ' + t.lidas + ' ';
+
+    if (novoModo === 'percentual') {
+      pagInicial.max = 100;
+      pagFinal.max = 100;
+      pagInicial.placeholder = 'Ex.: 25';
+      pagFinal.placeholder = 'Ex.: 40';
+      if (opcoes.avisar && totalPaginasDoLivro(livro) === 0) {
+        Util.toast('Este livro está sem o total de páginas: o % será salvo como páginas equivalentes (1% = 1 página). Preencha o total no cadastro do livro para ficar preciso.', 'warning');
+      }
+    } else {
+      pagInicial.removeAttribute('max');
+      pagFinal.removeAttribute('max');
+      pagInicial.removeAttribute('placeholder');
+      pagFinal.removeAttribute('placeholder');
+    }
+  }
+
   // Preenche hora fim/início estimando quanto tempo as páginas desta sessão
   // levariam, com base no ritmo médio (páginas por hora) do livro até agora.
   async function preencherComTempoMedio() {
@@ -142,12 +233,13 @@ const Leitura = (() => {
       return;
     }
     if (pagInicial.value === '' || pagFinal.value === '') {
-      Util.toast('Informe a página inicial e a página final antes de usar o tempo médio.', 'warning');
+      Util.toast('Informe o início e o fim da leitura antes de usar o tempo médio.', 'warning');
       return;
     }
-    const paginasSessao = contarPaginas(parseInt(pagInicial.value, 10), parseInt(pagFinal.value, 10));
+    const equivalentes = paginasEquivalentesDoForm();
+    const paginasSessao = contarPaginas(equivalentes.pi, equivalentes.pf);
     if (paginasSessao <= 0) {
-      Util.toast('A página final precisa ser maior que a inicial.', 'warning');
+      Util.toast(modoAtual === 'percentual' ? 'O fim precisa ser maior que o início.' : 'A página final precisa ser maior que a inicial.', 'warning');
       return;
     }
     if (horaInicio.disabled) {
@@ -235,6 +327,7 @@ const Leitura = (() => {
     criarBotaoTempoMedio();
 
     livroInput.addEventListener('change', () => {
+      aplicarModoRegistro({ avisar: true });
       atualizarUltimaPagina();
       const texto = livroInput.value.trim();
       const id = livroMap[texto];
@@ -781,18 +874,23 @@ const Leitura = (() => {
     limparRascunho();
   }
   
-  async function carregarLivros() {
-    try {
-      livroInput.value = '';
-      livroDatalist.innerHTML = '';
-      const resp = await API.enviar({ acao: 'listBooks' });
-      if (resp && Array.isArray(resp)) {
-        livrosCache = resp;
-        renderizarDatalist();
+  function carregarLivros() {
+    promessaLivros = (async () => {
+      try {
+        livroInput.value = '';
+        livroDatalist.innerHTML = '';
+        // listAllBooks traz o Formato do livro (listBooks não traz).
+        const resp = await API.enviar({ acao: 'listAllBooks' });
+        if (resp && Array.isArray(resp)) {
+          livrosCache = resp.map(l => ({ ...l, PáginasLidasAcumuladas: l.PáginasLidas }));
+          renderizarDatalist();
+        }
+      } catch (e) {
+        Util.toast('Erro ao carregar livros', 'danger');
       }
-    } catch (e) {
-      Util.toast('Erro ao carregar livros', 'danger');
-    }
+      aplicarModoRegistro();
+    })();
+    return promessaLivros;
   }
 
   function renderizarDatalist() {
@@ -829,6 +927,7 @@ const Leitura = (() => {
 
     const texto = `${livroPadrao.Título} - ${livroPadrao.Autor} (${livroPadrao.Status})`;
     livroInput.value = texto;
+    aplicarModoRegistro({ avisar: true });
     livroInfo.innerHTML = `
       <strong>${livroPadrao.Título}</strong> | ${livroPadrao.Autor}<br>
       Páginas totais: ${livroPadrao.NúmeroPáginas || '?'} | Status: ${livroPadrao.Status} | Lidas: ${livroPadrao.PáginasLidasAcumuladas || 0}
@@ -849,7 +948,11 @@ const Leitura = (() => {
     try {
       const r = await API.enviar({ acao: 'ultimaPaginaLivro', livroID: id });
       if (meuToken !== tokenUltimaPagina) return; // escolheu outro livro enquanto buscava
-      if (r && r.pagina != null) { valor.textContent = r.pagina; caixa.hidden = false; }
+      if (r && r.pagina != null) {
+        const livro = obterLivroSelecionado();
+        valor.textContent = emModoPercentual(livro) ? paginaParaPercentual(r.pagina, totalPaginasDoLivro(livro)) + '%' : r.pagina;
+        caixa.hidden = false;
+      }
       else caixa.hidden = true;
     } catch (e) { if (meuToken === tokenUltimaPagina) caixa.hidden = true; }
   }
@@ -881,9 +984,16 @@ const Leitura = (() => {
     const pi = parseInt(pagInicial.value) || 0;
     const pf = parseInt(pagFinal.value) || 0;
     if (pf > pi) {
-      let lidas = pf - pi;
-      if (pi > 0) lidas += 1;
-      pagLidasSpan.textContent = Math.max(0, lidas);
+      if (modoAtual === 'percentual') {
+        const total = totalPaginasDoLivro(obterLivroSelecionado());
+        const pontos = pf - pi;
+        const equivalentes = Math.max(0, percentualParaPagina(pf, total) - percentualParaPagina(pi, total));
+        pagLidasSpan.textContent = total > 0 ? `${pontos}% (≈ ${equivalentes} págs)` : `${pontos}%`;
+      } else {
+        let lidas = pf - pi;
+        if (pi > 0) lidas += 1;
+        pagLidasSpan.textContent = Math.max(0, lidas);
+      }
       pagLidasDiv.classList.remove('d-none');
     }
   }
@@ -1122,13 +1232,15 @@ const Leitura = (() => {
       return;
     }
 
+    const equivalentes = paginasEquivalentesDoForm();
     const sessao = {
       livroID,
       data: dataInput.value,
       horaInicio: sanitizarHora(horaInicio.value),
       horaFim: sanitizarHora(horaFim.value),
-      paginaInicial: pagInicial.value,
-      paginaFinal: pagFinal.value,
+      // Kindle/Audiobook: o % já vai convertido em página equivalente
+      paginaInicial: modoAtual === 'percentual' ? String(equivalentes.pi) : pagInicial.value,
+      paginaFinal: modoAtual === 'percentual' ? String(equivalentes.pf) : pagFinal.value,
       local: document.getElementById('local-sessao').value,
       humor: document.getElementById('humor').value,
       clima: document.getElementById('clima').value,
@@ -1214,6 +1326,7 @@ const Leitura = (() => {
     pagLidasDiv.classList.add('d-none');
     livroInfo.innerHTML = '';
     editandoSessaoID = null;
+    aplicarModoRegistro();
     resetarCronometro();
     // Limpa anotações extras e adiciona um item vazio
     if (containerAnotacoes) {
@@ -1244,6 +1357,9 @@ const Leitura = (() => {
     // nessa ordem para usar depois na escolha do livro padrão do formulário.
     sessoesCache = sessoes;
 
+    // Espera os livros carregarem (títulos e formato vêm deles).
+    if (promessaLivros) await promessaLivros.catch(() => {});
+
     if (sessoes.length > 0) {
       historicoContainer.innerHTML = '';
       const mapaTitulos = {};
@@ -1251,9 +1367,17 @@ const Leitura = (() => {
 
       sessoes.slice(0, 20).forEach(sess => {
         const dataFormatada = sess.Data ? new Date(sess.Data).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '?';
+        const livroDaSessao = livrosCache.find(l => l.ID === sess.LivroID);
         const pi = sess.PáginaInicial || '?';
         const pf = sess.PáginaFinal || '?';
         const pagLidas = sess.PáginasLidas || 0;
+        let posicao = `Pág. ${pi}-${pf} (${pagLidas} pág)`;
+        if (emModoPercentual(livroDaSessao)) {
+          const total = totalPaginasDoLivro(livroDaSessao);
+          const pctI = paginaParaPercentual(sess.PáginaInicial, total);
+          const pctF = paginaParaPercentual(sess.PáginaFinal, total);
+          posicao = `${pctI}% → ${pctF}% (+${Math.max(0, pctF - pctI)}%)`;
+        }
         const tempo = sess.Tempo ? `${sess.Tempo} min` : '';
         const nomeLivro = mapaTitulos[sess.LivroID] || 'Desconhecido';
 
@@ -1262,7 +1386,7 @@ const Leitura = (() => {
         div.innerHTML = `
           <div>
             <strong>${nomeLivro}</strong><br>
-            <small>${dataFormatada} - Pág. ${pi}-${pf} (${pagLidas} pág) ${tempo}</small>
+            <small>${dataFormatada} - ${posicao} ${tempo}</small>
             ${sess.Local ? `<br><small class="text-muted">Local: ${sess.Local}</small>` : ''}
           </div>
           <div>
@@ -1290,8 +1414,15 @@ const Leitura = (() => {
     dataInput.value = sess.Data;
     horaInicio.value = sess.HoraInício || '';
     horaFim.value = sess.HoraFim || '';
-    pagInicial.value = sess.PáginaInicial;
-    pagFinal.value = sess.PáginaFinal;
+    aplicarModoRegistro();
+    if (modoAtual === 'percentual') {
+      const total = totalPaginasDoLivro(livroEdit);
+      pagInicial.value = paginaParaPercentual(sess.PáginaInicial, total);
+      pagFinal.value = paginaParaPercentual(sess.PáginaFinal, total);
+    } else {
+      pagInicial.value = sess.PáginaInicial;
+      pagFinal.value = sess.PáginaFinal;
+    }
     document.getElementById('local-sessao').value = sess.Local || '';
     document.getElementById('humor').value = sess.Humor || '';
     document.getElementById('clima').value = sess.Clima || '';
